@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, type CSSProperties } from "react"
 
 import Button from "@/components/button"
 
@@ -24,6 +24,13 @@ import s from "./styles.module.css"
 /** Stable DOM id on the native-pixel graphic root for Export capture. */
 export const MATCHDAY_GRAPHIC_EXPORT_ROOT_ID = "matchday-graphic-export-root"
 
+/** Sticky offset from viewport top (CSS `top`). */
+const STICKY_TOP_PX = 20
+/** Space under the panel when stuck / at rest. */
+const BOTTOM_GAP_PX = 20
+/** Home page vertical padding (see `(home)/styles.module.css`). */
+const PAGE_PAD_Y_PX = 20
+
 type PreviewPanelProps = {
   draft: Draft
   playerLibrary: PlayerLibrary
@@ -33,13 +40,10 @@ type PreviewPanelProps = {
   onFormatChange: (format: GraphicFormatId) => void
 }
 
-/** Fallback before the column width is measured. */
-const PREVIEW_WIDTH_FALLBACK = 520
-
 /**
  * Live Matchday Squad preview for Portrait + Story.
- * Scale lives on a wrapper only — the graphic root stays export-friendly.
- * On-screen size tracks the right-column width so the preview fills available space.
+ * Whole sticky card stays on-screen at a stable height (viewport − header −
+ * gaps). Does not resize on scroll. Graphic fit is pure CSS (cqw/cqh).
  */
 export default function PreviewPanel({
   draft,
@@ -53,33 +57,43 @@ export default function PreviewPanel({
     GRAPHIC_FORMATS.find((format) => format.id === activeFormat) ??
     GRAPHIC_FORMATS[0]
 
-  const frameRef = useRef<HTMLDivElement>(null)
-  const [frameWidth, setFrameWidth] = useState(PREVIEW_WIDTH_FALLBACK)
+  const sectionRef = useRef<HTMLElement>(null)
   const [isExporting, setIsExporting] = useState(false)
   const [exportError, setExportError] = useState<string | null>(null)
 
+  /*
+    Stable panel height — resize only, never scroll.
+    Fits under the header at page top; still fully visible when sticky.
+  */
   useEffect(() => {
-    const el = frameRef.current
-    if (!el) return
+    const section = sectionRef.current
+    if (!section) return
 
-    const update = (width: number) => {
-      if (width > 0) setFrameWidth(width)
+    const update = () => {
+      const header = document.querySelector("header")
+      const headerH = header?.getBoundingClientRect().height ?? 0
+      const height = Math.max(
+        240,
+        window.innerHeight - headerH - PAGE_PAD_Y_PX - BOTTOM_GAP_PX
+      )
+      section.style.setProperty("--preview-panel-height", `${height}px`)
     }
 
-    update(el.getBoundingClientRect().width)
+    update()
+    window.addEventListener("resize", update)
 
-    const observer = new ResizeObserver((entries) => {
-      const entry = entries[0]
-      if (!entry) return
-      update(entry.contentRect.width)
-    })
-    observer.observe(el)
-    return () => observer.disconnect()
+    const header = document.querySelector("header")
+    const ro =
+      header && typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(update)
+        : null
+    if (header && ro) ro.observe(header)
+
+    return () => {
+      window.removeEventListener("resize", update)
+      ro?.disconnect()
+    }
   }, [])
-
-  const scale = frameWidth / active.width
-  const displayWidth = Math.round(active.width * scale)
-  const displayHeight = Math.round(active.height * scale)
 
   async function handleExport() {
     if (isExporting) return
@@ -106,7 +120,12 @@ export default function PreviewPanel({
   }
 
   return (
-    <section className={s.section} aria-labelledby="preview-heading">
+    <section
+      ref={sectionRef}
+      className={s.section}
+      aria-labelledby="preview-heading"
+      style={{ "--sticky-top": `${STICKY_TOP_PX}px` } as CSSProperties}
+    >
       <div className={s.toolbar}>
         <h2 id="preview-heading" className={s.heading}>
           Preview
@@ -130,10 +149,7 @@ export default function PreviewPanel({
                 className={selected ? s.tabActive : s.tab}
                 onClick={() => onFormatChange(format.id)}
               >
-                {format.label}
-                <span className={s.tabSize}>
-                  {format.width}×{format.height}
-                </span>
+                {format.label} ({format.width}×{format.height})
               </button>
             )
           })}
@@ -146,24 +162,17 @@ export default function PreviewPanel({
         aria-labelledby={`format-tab-${active.id}`}
         className={s.panel}
       >
-        {/* Width probe: full column; height comes from scaled native aspect */}
-        <div ref={frameRef} className={s.frameMeasure}>
+        <div className={s.frameMeasure}>
           <div
             className={s.scaleWrap}
-            style={{ width: displayWidth, height: displayHeight }}
+            style={
+              {
+                "--format-w": active.width,
+                "--format-h": active.height,
+              } as CSSProperties
+            }
           >
-            {/*
-              Scale is applied only to this layer. MatchdayGraphic stays at
-              native pixels with no transform — Export can capture its root.
-            */}
-            <div
-              className={s.scaleLayer}
-              style={{
-                width: active.width,
-                height: active.height,
-                transform: `scale(${scale})`,
-              }}
-            >
+            <div className={s.scaleLayer}>
               <MatchdayGraphic
                 draft={draft}
                 playerLibrary={playerLibrary}
@@ -177,27 +186,29 @@ export default function PreviewPanel({
         </div>
       </div>
 
-      <div className={s.exportRow}>
-        <Button
-          type="button"
-          variant="primary"
-          onClick={handleExport}
-          isLoading={isExporting}
-          disabled={isExporting}
-        >
-          {isExporting ? "Exporting…" : `Download ${active.label} PNG`}
-        </Button>
-        <p className={s.hint}>
-          Full resolution {active.width}×{active.height}. Switch tabs to export
-          the other Graphic Format.
-        </p>
-      </div>
+      <div className={s.exportStack}>
+        <div className={s.exportRow}>
+          <Button
+            type="button"
+            variant="primary"
+            onClick={handleExport}
+            isLoading={isExporting}
+            disabled={isExporting}
+          >
+            {isExporting ? "Exporting…" : `Download ${active.label} PNG`}
+          </Button>
+          <p className={s.hint}>
+            Full resolution {active.width}×{active.height}. Switch tabs to
+            export the other Graphic Format.
+          </p>
+        </div>
 
-      {exportError ? (
-        <p className={s.exportError} role="alert">
-          {exportError}
-        </p>
-      ) : null}
+        {exportError ? (
+          <p className={s.exportError} role="alert">
+            {exportError}
+          </p>
+        ) : null}
+      </div>
     </section>
   )
 }
