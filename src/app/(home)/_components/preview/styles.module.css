@@ -87,9 +87,24 @@
   will-change: transform;
 }
 
+.exportRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
 .hint {
   margin: 0;
   font-size: 12px;
   line-height: 1.4;
   color: var(--color-grey-600);
+  flex: 1 1 160px;
+}
+
+.exportError {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--color-danger);
 }

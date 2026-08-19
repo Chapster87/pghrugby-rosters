@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react"
 
+import Button from "@/components/button"
+
 import type {
   Draft,
   PlayerLibrary,
@@ -11,9 +13,16 @@ import {
   GRAPHIC_FORMATS,
   type GraphicFormatId,
 } from "../../_static/graphic-formats"
+import {
+  buildExportFilename,
+  exportElementAsPng,
+} from "../../_helpers/export-png"
 import MatchdayGraphic from "./_components/matchday-graphic"
 
 import s from "./styles.module.css"
+
+/** Stable DOM id on the native-pixel graphic root for Export capture. */
+export const MATCHDAY_GRAPHIC_EXPORT_ROOT_ID = "matchday-graphic-export-root"
 
 type PreviewPanelProps = {
   draft: Draft
@@ -46,6 +55,8 @@ export default function PreviewPanel({
 
   const frameRef = useRef<HTMLDivElement>(null)
   const [frameWidth, setFrameWidth] = useState(PREVIEW_WIDTH_FALLBACK)
+  const [isExporting, setIsExporting] = useState(false)
+  const [exportError, setExportError] = useState<string | null>(null)
 
   useEffect(() => {
     const el = frameRef.current
@@ -69,6 +80,30 @@ export default function PreviewPanel({
   const scale = frameWidth / active.width
   const displayWidth = Math.round(active.width * scale)
   const displayHeight = Math.round(active.height * scale)
+
+  async function handleExport() {
+    if (isExporting) return
+    setExportError(null)
+
+    const root = document.getElementById(MATCHDAY_GRAPHIC_EXPORT_ROOT_ID)
+    if (!root) {
+      setExportError("Preview graphic is not ready to export yet.")
+      return
+    }
+
+    setIsExporting(true)
+    try {
+      const filename = buildExportFilename(active, draft)
+      await exportElementAsPng(root, filename)
+    } catch (error) {
+      console.error("PNG Export failed", error)
+      setExportError(
+        "Could not export PNG. Check that remote player photos load (Drive links are converted automatically), then try again."
+      )
+    } finally {
+      setIsExporting(false)
+    }
+  }
 
   return (
     <section className={s.section} aria-labelledby="preview-heading">
@@ -135,17 +170,34 @@ export default function PreviewPanel({
                 sponsors={sponsors}
                 clubLogoSrc={clubLogoSrc}
                 format={active}
-                exportRootId="matchday-graphic-export-root"
+                exportRootId={MATCHDAY_GRAPHIC_EXPORT_ROOT_ID}
               />
             </div>
           </div>
         </div>
       </div>
 
-      <p className={s.hint}>
-        Preview is scaled to fit the column ({active.label} {active.width}×
-        {active.height}). Downloads will be full resolution.
-      </p>
+      <div className={s.exportRow}>
+        <Button
+          type="button"
+          variant="primary"
+          onClick={handleExport}
+          isLoading={isExporting}
+          disabled={isExporting}
+        >
+          {isExporting ? "Exporting…" : `Download ${active.label} PNG`}
+        </Button>
+        <p className={s.hint}>
+          Full resolution {active.width}×{active.height}. Switch tabs to export
+          the other Graphic Format.
+        </p>
+      </div>
+
+      {exportError ? (
+        <p className={s.exportError} role="alert">
+          {exportError}
+        </p>
+      ) : null}
     </section>
   )
 }

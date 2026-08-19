@@ -12,6 +12,7 @@ import {
   type RosterSlotDefinition,
   type RosterSlotGroup,
 } from "../../../../_static/roster-slots"
+import { corsModeForImageSrc } from "../../../../_helpers/export-png"
 import { formatMatchDate } from "../../../../_helpers/format-match-date"
 import { resolveSlotPhotoSrc } from "../../../../_helpers/resolve-slot-photo"
 
@@ -100,7 +101,12 @@ export default function MatchdayGraphic({
     >
       <header className={s.header}>
         <div className={s.logo}>
-          <img src={clubLogoSrc} alt="" draggable={false} />
+          <img
+            src={clubLogoSrc}
+            alt=""
+            draggable={false}
+            crossOrigin={corsModeForImageSrc(clubLogoSrc)}
+          />
         </div>
         <div className={s.titles}>
           <p className={s.clubName}>PITTSBURGH FORGE</p>
@@ -158,8 +164,10 @@ export default function MatchdayGraphic({
                       alt=""
                       className={s.photo}
                       draggable={false}
+                      crossOrigin={corsModeForImageSrc(slot.photoSrc)}
                       onError={(event) => {
                         event.currentTarget.onerror = null
+                        event.currentTarget.removeAttribute("crossorigin")
                         event.currentTarget.src = clubLogoSrc
                       }}
                     />
@@ -186,6 +194,7 @@ export default function MatchdayGraphic({
                 src={src}
                 alt=""
                 draggable={false}
+                crossOrigin={corsModeForImageSrc(src)}
               />
             ))}
           </div>
