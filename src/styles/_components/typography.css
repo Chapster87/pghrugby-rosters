@@ -85,7 +85,7 @@ a {
   transition: color 0.3s ease;
 
   &:hover {
-    color: var(--color-blue-ada);
+    color: var(--color-grey-900);
     text-decoration: none;
   }
 }

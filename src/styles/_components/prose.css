@@ -132,7 +132,7 @@
     color: var(--color-primary);
 
     &:hover {
-      color: var(--color-blue-ada);
+      color: var(--color-grey-900);
     }
   }
 

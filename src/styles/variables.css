@@ -1,14 +1,15 @@
 :root {
+  /* Forge crest palette mapped into existing token names */
   --color-white: #ffffff;
   --color-grey-100: #f8f9fa;
-  --color-grey-200: #e9ecef;
+  --color-grey-200: #e9e9ec;
   --color-grey-300: #dee2e6;
   --color-grey-400: #ced4da;
   --color-grey-500: #adb5bd;
-  --color-grey-600: #6c757d;
+  --color-grey-600: #8a8a8a;
   --color-grey-700: #495057;
   --color-grey-800: #343a40;
-  --color-grey-900: #222222;
+  --color-grey-900: #1a1a1a;
   --color-black: #000000;
 
   --color-gold: #ffb81c;
@@ -17,7 +18,8 @@
   --color-blue: #377cfb;
   --color-blue-ada: #004bb3;
 
-  --color-primary: var(--color-green);
+  /* HTML --forge-gold → primary; ember stays danger/accent via red */
+  --color-primary: var(--color-gold);
 
   --color-success: #198754;
   --color-warning: var(--color-gold);
@@ -31,13 +33,14 @@
 
   --animate-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 
-  --background: var(--color-white);
+  /* App chrome: light grey work surface (HTML body #e9e9ec) */
+  --background: var(--color-grey-200);
   --foreground: var(--color-black);
 
-  --text-primary: #000;
-  --text-secondary: #666;
+  --text-primary: var(--color-black);
+  --text-secondary: var(--color-grey-600);
 
-  --background-overlay: rgba(255, 255, 255, 0.4);
+  --background-overlay: rgba(255, 255, 255, 0.72);
 
   --box-shadow:
     0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
@@ -45,10 +48,13 @@
 
 /* @media (prefers-color-scheme: dark) { */
 [data-theme="dark"] {
-  --color-primary: var(--color-blue);
+  --color-primary: var(--color-gold);
 
   --background: var(--color-black);
   --foreground: var(--color-white);
 
-  --background-overlay: rgba(32, 32, 32, 0.4);
+  --text-primary: var(--color-white);
+  --text-secondary: var(--color-grey-600);
+
+  --background-overlay: rgba(26, 26, 26, 0.72);
 }

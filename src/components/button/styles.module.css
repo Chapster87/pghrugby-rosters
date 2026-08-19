@@ -3,14 +3,19 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  font-weight: 600;
+  font-weight: 700;
+  border: none;
   border-radius: 8px;
   outline: none;
-  transition: background-color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
   cursor: pointer;
   padding: 16px 24px;
   font-size: 1rem;
   text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
 }
 
 .unstyled {
@@ -20,25 +25,34 @@
   font: inherit;
   color: inherit;
   cursor: pointer;
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: inherit;
 }
 
+/* HTML .btn-primary: gold fill, black type */
 .primary {
   background-color: var(--color-primary);
-  color: var(--color-white);
+  color: var(--color-black);
 
   &:hover {
-    background-color: #009b28;
-    color: var(--color-white);
+    background-color: color-mix(
+      in srgb,
+      var(--color-primary) 82%,
+      var(--color-black)
+    );
+    color: var(--color-black);
   }
 }
 
+/* HTML .btn-ghost: light fill, dark type */
 .secondary {
-  background-color: var(--color-grey-800);
-  color: var(--color-white);
+  background-color: var(--color-grey-200);
+  color: var(--color-grey-800);
 
   &:hover {
-    background-color: #4b5563;
-    color: var(--color-white);
+    background-color: var(--color-grey-300);
+    color: var(--color-black);
   }
 }
 

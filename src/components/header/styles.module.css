@@ -1,44 +1,8 @@
-.headerBanner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--color-primary);
-  color: var(--foreground);
-  text-align: center;
-  padding: 12px 0;
-  gap: 8px;
-  font-weight: 600;
-}
-
-.bannerIcon {
-  display: none;
-
-  @media (--viewport-lg-up) {
-    display: block;
-  }
-}
-
-.bannerText {
-  display: none;
-
-  @media (--viewport-lg-up) {
-    display: block;
-  }
-}
-
-.bannerLink {
-  color: var(--background);
-}
-
 .header {
-  position: sticky;
-  top: 0;
-  left: 0;
-  border-bottom: 2px solid var(--color-primary);
+  background-color: var(--color-black);
+  color: var(--color-white);
   padding: 16px 0;
-  background-color: var(--background);
-  background-color: rgb(249, 250, 251, 0.4);
-  backdrop-filter: blur(6px);
+  border-bottom: 4px solid var(--color-primary);
   z-index: 50;
 }
 
@@ -49,22 +13,26 @@
   justify-content: space-between;
 }
 
-.navList {
-  list-style: none;
+.brand {
   display: flex;
-  align-items: center;
-  gap: 24px;
-  font-size: 24px;
-  font-weight: 700;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
 }
 
-.navLink {
-  text-decoration: none;
-  color: var(--foreground);
-  transition: color 0.3s ease;
+.title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--color-white);
+  line-height: 1.3;
+}
 
-  &:hover {
-    color: var(--color-primary);
-    text-decoration: underline;
-  }
+.subtitle {
+  margin: 2px 0 0;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-grey-600);
+  line-height: 1.4;
 }
