@@ -16,9 +16,128 @@
   color: var(--color-black);
 }
 
-.hint {
+.addRow {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  @media (--viewport-sm-up) {
+    flex-direction: row;
+    align-items: flex-end;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.urlField {
+  flex: 1.4 1 auto;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-grey-700);
+}
+
+.input {
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--color-grey-300);
+  border-radius: 8px;
+  background-color: var(--color-white);
+  color: var(--color-black);
+  font: inherit;
+  font-size: 14px;
+}
+
+.input:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
+.addAction {
+  flex: 0 0 auto;
+}
+
+.error {
   margin: 0;
   font-size: 13px;
+  color: var(--color-danger);
+}
+
+.empty {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--color-grey-600);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  padding: 4px 8px 4px 4px;
+  border-radius: 999px;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-grey-300);
+}
+
+.chipThumb {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: var(--color-grey-100);
+}
+
+.chipName {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-black);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.removeChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-danger);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.removeChip:hover {
+  background-color: var(--color-grey-100);
+}
+
+.note {
+  margin: 0;
+  font-size: 12px;
   line-height: 1.4;
   color: var(--color-grey-600);
 }

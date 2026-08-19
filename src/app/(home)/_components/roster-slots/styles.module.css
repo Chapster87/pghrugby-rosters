@@ -45,12 +45,9 @@
 
 .slotItem {
   display: grid;
-  grid-template-columns: 32px 1fr 1fr;
+  grid-template-columns: 32px minmax(0, 1.1fr) minmax(0, 1.2fr) 32px;
   gap: 8px;
   align-items: center;
-  min-height: 32px;
-  font-size: 13px;
-  line-height: 1.3;
 }
 
 .jersey {
@@ -66,17 +63,51 @@
   font-weight: 700;
 }
 
-.position {
-  color: var(--color-grey-600);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.posInput,
+.nameInput {
+  width: 100%;
+  min-height: 36px;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid var(--color-grey-300);
+  border-radius: 8px;
+  background-color: var(--color-white);
+  color: var(--color-black);
+  font: inherit;
+  font-size: 13px;
 }
 
-.name {
-  font-weight: 600;
-  color: var(--color-black);
+.posInput:focus,
+.nameInput:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
+.thumb {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: var(--color-grey-100);
+  border: 1px solid var(--color-grey-300);
+}
+
+.thumbPlaceholder {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: transparent;
+  border: 1px dashed var(--color-grey-300);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
   overflow: hidden;
-  text-overflow: ellipsis;
+  clip: rect(0, 0, 0, 0);
   white-space: nowrap;
+  border: 0;
 }

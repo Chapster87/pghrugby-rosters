@@ -13,10 +13,18 @@ import s from "./styles.module.css"
 
 /**
  * Composed Matchday Squad builder shell.
- * Section components are seams for later parity / preview / export tickets.
+ * Controls are interactive; preview/export fill in on later tickets.
  */
 export default function BuilderShell() {
   const builder = useBuilderState()
+
+  function handleClearDraft() {
+    const confirmed = window.confirm(
+      "Clear all names and match details for a new week? Your logo and photo library are kept."
+    )
+    if (!confirmed) return
+    builder.clearDraft()
+  }
 
   return (
     <div className={s.shell} data-ready={builder.isReady}>
@@ -30,6 +38,7 @@ export default function BuilderShell() {
 
         <PlayerLibraryPanel
           library={builder.playerLibrary}
+          clubLogoSrc={builder.clubLogoSrc}
           onUpsert={builder.upsertPlayerLibraryEntry}
           onRemove={builder.removePlayerLibraryEntry}
         />
@@ -47,7 +56,7 @@ export default function BuilderShell() {
         />
 
         <div className={s.actions}>
-          <Button variant="secondary" type="button" onClick={builder.clearDraft}>
+          <Button variant="secondary" type="button" onClick={handleClearDraft}>
             New Week (clear roster)
           </Button>
         </div>

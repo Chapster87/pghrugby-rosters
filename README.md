@@ -1,39 +1,42 @@
-# Next.js Starter Template
+# Pittsburgh Forge Roster Builder
 
-![https://nextjs.org//](https://img.shields.io/badge/next.js-16.2.1-black?style=for-the-badge&logo=nextdotjs&logoColor=white)
-![https://www.typescriptlang.org/](https://img.shields.io/badge/typescript-5.0.0-blue?style=for-the-badge&logo=typescript&link=https%3A%2F%2Fwww.typescriptlang.org%2F)
+Client-side tool for building weekly **Matchday Squad** graphics for Pittsburgh Forge rugby social media.
 
-## Getting Started
+Built with Next.js (App Router, static export), TypeScript, and CSS Modules.
 
-First, run the development server:
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## What it does
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Enter weekly **Match Details** (opponent, date, kickoff, venue, competition, address)
+- Manage a **Player Library** (name → photo URL, including Google Drive links)
+- Fill **Roster Slots** 1–23 (forwards / backs / finishers)
+- Attach **Sponsor** logos and the **Club Logo**
+- Preview **Portrait (1080×1350)** and **Story (1080×1920)** formats
+- Export PNG for social posting
 
-## Learn More
+Draft, library, sponsors, and club logo persist in the browser (`localStorage`).
 
-To learn more about Next.js, take a look at the following resources:
+## Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Command      | Description                |
+| ------------ | -------------------------- |
+| `pnpm dev`   | Local development server   |
+| `pnpm build` | Production static export   |
+| `pnpm start` | Serve the production build |
+| `pnpm lint`  | ESLint                     |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Domain language
 
-## Deploy on Vercel
+See [`CONTEXT.md`](./CONTEXT.md) for product terms (Matchday Squad, Roster Slot, Draft, etc.).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Reference
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Legacy single-file tool: [`roster-generator.html`](./roster-generator.html) (behavior reference; feed format in the app is Portrait 1080×1350, not the HTML’s 1080×1080 square).

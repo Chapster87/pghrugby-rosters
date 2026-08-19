@@ -1,10 +1,16 @@
 .section {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 24px;
   padding: 16px;
   background-color: var(--background-overlay);
   border-radius: 8px;
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .heading {
@@ -16,7 +22,7 @@
   color: var(--color-black);
 }
 
-.placeholderRow {
+.logoUpload {
   display: flex;
   align-items: center;
   gap: 16px;
@@ -39,9 +45,74 @@
   object-fit: contain;
 }
 
-.hint {
-  margin: 0;
+.logoControls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.fileLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.fileLabelText {
+  display: none;
+}
+
+.fileInput {
+  width: 100%;
+  max-width: 240px;
   font-size: 13px;
+  color: var(--color-grey-700);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-grey-700);
+}
+
+.input {
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--color-grey-300);
+  border-radius: 8px;
+  background-color: var(--color-white);
+  color: var(--color-black);
+  font: inherit;
+  font-size: 14px;
+}
+
+.input:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
+.row2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+
+  @media (--viewport-sm-up) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.note {
+  margin: 0;
+  font-size: 12px;
   line-height: 1.4;
   color: var(--color-grey-600);
 }

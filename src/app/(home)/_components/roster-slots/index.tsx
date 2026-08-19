@@ -1,5 +1,7 @@
 "use client"
 
+import { useId, useMemo } from "react"
+
 import type {
   Draft,
   PlayerLibrary,
@@ -20,15 +22,28 @@ type RosterSlotsPanelProps = {
 
 /**
  * Roster Slot editors grouped by forwards / backs / finishers.
- * Full slot rows land in the controls-parity ticket.
+ * Name fields autocomplete from the Player Library; photo thumb fills on name match.
+ * Finishers stay editable here even when unnamed (graphic omits empty finishers later).
  */
 export default function RosterSlotsPanel({
   draft,
-  playerLibrary: _playerLibrary,
-  onSlotChange: _onSlotChange,
+  playerLibrary,
+  onSlotChange,
 }: RosterSlotsPanelProps) {
+  const listId = useId()
+  const libraryNames = useMemo(
+    () => Object.keys(playerLibrary).sort((a, b) => a.localeCompare(b)),
+    [playerLibrary]
+  )
+
   return (
     <section className={s.section} aria-label="Roster Slots">
+      <datalist id={listId}>
+        {libraryNames.map((name) => (
+          <option key={name} value={name} />
+        ))}
+      </datalist>
+
       {ROSTER_SLOT_GROUPS.map((group) => {
         const slots = getRosterSlotsByGroup(group.id)
         const filled = slots.filter((slot) =>
@@ -45,14 +60,58 @@ export default function RosterSlotsPanel({
             </h2>
             <ul className={s.slotList}>
               {slots.map((slot) => {
-                const value = draft.slots[slot.number]
+                const value = draft.slots[slot.number] ?? {
+                  name: "",
+                  position: slot.position,
+                }
+                const trimmedName = value.name.trim()
+                const photoUrl =
+                  trimmedName && playerLibrary[trimmedName]
+                    ? playerLibrary[trimmedName]
+                    : null
+
                 return (
                   <li key={slot.number} className={s.slotItem}>
-                    <span className={s.jersey}>{slot.number}</span>
-                    <span className={s.position}>
-                      {value?.position || slot.position}
+                    <span className={s.jersey} aria-hidden="true">
+                      {slot.number}
                     </span>
-                    <span className={s.name}>{value?.name?.trim() || "—"}</span>
+                    <label className={s.srOnly} htmlFor={`pos-${slot.number}`}>
+                      Position for jersey {slot.number}
+                    </label>
+                    <input
+                      id={`pos-${slot.number}`}
+                      type="text"
+                      className={s.posInput}
+                      value={value.position}
+                      placeholder={slot.position}
+                      onChange={(event) =>
+                        onSlotChange(slot.number, {
+                          position: event.target.value,
+                        })
+                      }
+                    />
+                    <label className={s.srOnly} htmlFor={`name-${slot.number}`}>
+                      Player name for jersey {slot.number}
+                    </label>
+                    <input
+                      id={`name-${slot.number}`}
+                      type="text"
+                      className={s.nameInput}
+                      list={listId}
+                      value={value.name}
+                      placeholder="Player name"
+                      autoComplete="off"
+                      onChange={(event) =>
+                        onSlotChange(slot.number, {
+                          name: event.target.value,
+                        })
+                      }
+                    />
+                    {photoUrl ? (
+                      <img src={photoUrl} alt="" className={s.thumb} />
+                    ) : (
+                      <span className={s.thumbPlaceholder} aria-hidden="true" />
+                    )}
                   </li>
                 )
               })}
