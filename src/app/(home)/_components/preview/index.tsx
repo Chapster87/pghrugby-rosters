@@ -1,5 +1,7 @@
 "use client"
 
+import { useEffect, useRef, useState } from "react"
+
 import type {
   Draft,
   PlayerLibrary,
@@ -9,6 +11,7 @@ import {
   GRAPHIC_FORMATS,
   type GraphicFormatId,
 } from "../../_static/graphic-formats"
+import MatchdayGraphic from "./_components/matchday-graphic"
 
 import s from "./styles.module.css"
 
@@ -21,23 +24,51 @@ type PreviewPanelProps = {
   onFormatChange: (format: GraphicFormatId) => void
 }
 
+/** Fallback before the column width is measured. */
+const PREVIEW_WIDTH_FALLBACK = 520
+
 /**
  * Live Matchday Squad preview for Portrait + Story.
- * Graphic layout lands in the preview ticket; Export in the export ticket.
+ * Scale lives on a wrapper only — the graphic root stays export-friendly.
+ * On-screen size tracks the right-column width so the preview fills available space.
  */
 export default function PreviewPanel({
   draft,
-  playerLibrary: _playerLibrary,
+  playerLibrary,
   sponsors,
   clubLogoSrc,
   activeFormat,
   onFormatChange,
 }: PreviewPanelProps) {
-  const active = GRAPHIC_FORMATS.find((format) => format.id === activeFormat)
-  const filledSponsors = sponsors.filter(Boolean).length
-  const namedSlots = Object.values(draft.slots).filter((slot) =>
-    slot.name.trim()
-  ).length
+  const active =
+    GRAPHIC_FORMATS.find((format) => format.id === activeFormat) ??
+    GRAPHIC_FORMATS[0]
+
+  const frameRef = useRef<HTMLDivElement>(null)
+  const [frameWidth, setFrameWidth] = useState(PREVIEW_WIDTH_FALLBACK)
+
+  useEffect(() => {
+    const el = frameRef.current
+    if (!el) return
+
+    const update = (width: number) => {
+      if (width > 0) setFrameWidth(width)
+    }
+
+    update(el.getBoundingClientRect().width)
+
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0]
+      if (!entry) return
+      update(entry.contentRect.width)
+    })
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  const scale = frameWidth / active.width
+  const displayWidth = Math.round(active.width * scale)
+  const displayHeight = Math.round(active.height * scale)
 
   return (
     <section className={s.section} aria-labelledby="preview-heading">
@@ -57,39 +88,64 @@ export default function PreviewPanel({
                 key={format.id}
                 type="button"
                 role="tab"
+                id={`format-tab-${format.id}`}
                 aria-selected={selected}
+                aria-controls="format-panel"
+                tabIndex={selected ? 0 : -1}
                 className={selected ? s.tabActive : s.tab}
                 onClick={() => onFormatChange(format.id)}
               >
                 {format.label}
+                <span className={s.tabSize}>
+                  {format.width}×{format.height}
+                </span>
               </button>
             )
           })}
         </div>
       </div>
 
-      <div className={s.canvasFrame}>
-        <div className={s.canvasMeta}>
-          <img src={clubLogoSrc} alt="" className={s.logoThumb} />
-          <div>
-            <p className={s.metaTitle}>
-              {draft.opponent.trim() || "TBD Opponent"}
-            </p>
-            <p className={s.metaSub}>
-              {active
-                ? `${active.label} · ${active.width}×${active.height}`
-                : null}
-            </p>
-            <p className={s.metaSub}>
-              {namedSlots} named · {filledSponsors} sponsor
-              {filledSponsors === 1 ? "" : "s"}
-            </p>
+      <div
+        id="format-panel"
+        role="tabpanel"
+        aria-labelledby={`format-tab-${active.id}`}
+        className={s.panel}
+      >
+        {/* Width probe: full column; height comes from scaled native aspect */}
+        <div ref={frameRef} className={s.frameMeasure}>
+          <div
+            className={s.scaleWrap}
+            style={{ width: displayWidth, height: displayHeight }}
+          >
+            {/*
+              Scale is applied only to this layer. MatchdayGraphic stays at
+              native pixels with no transform — Export can capture its root.
+            */}
+            <div
+              className={s.scaleLayer}
+              style={{
+                width: active.width,
+                height: active.height,
+                transform: `scale(${scale})`,
+              }}
+            >
+              <MatchdayGraphic
+                draft={draft}
+                playerLibrary={playerLibrary}
+                sponsors={sponsors}
+                clubLogoSrc={clubLogoSrc}
+                format={active}
+                exportRootId="matchday-graphic-export-root"
+              />
+            </div>
           </div>
         </div>
-        <p className={s.hint}>
-          Full Portrait / Story graphic renders here in the preview ticket.
-        </p>
       </div>
+
+      <p className={s.hint}>
+        Preview is scaled to fit the column ({active.label} {active.width}×
+        {active.height}). Downloads will be full resolution.
+      </p>
     </section>
   )
 }

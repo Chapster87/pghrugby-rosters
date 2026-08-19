@@ -13,7 +13,7 @@ import s from "./styles.module.css"
 
 /**
  * Composed Matchday Squad builder shell.
- * Controls are interactive; preview/export fill in on later tickets.
+ * Controls + live Portrait/Story preview; PNG Export fills in on the next ticket.
  */
 export default function BuilderShell() {
   const builder = useBuilderState()
