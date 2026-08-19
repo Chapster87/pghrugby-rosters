@@ -39,15 +39,39 @@ jobs:
           DREAMHOST_USERNAME: ${{ secrets.DREAMHOST_USERNAME }}
           DREAMHOST_SSH_KEY: ${{ secrets.DREAMHOST_SSH_KEY }}
         run: |
+          set -euo pipefail
+
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
 
-          # Write private key; normalize possible CRLF from secret paste
-          printf '%s\n' "$DREAMHOST_SSH_KEY" | tr -d '\r' > ~/.ssh/dreamhost_deploy
+          if [ -z "${DREAMHOST_HOST}" ] || [ -z "${DREAMHOST_USERNAME}" ] || [ -z "${DREAMHOST_SSH_KEY}" ]; then
+            echo "One or more required secrets are empty: DREAMHOST_HOST / DREAMHOST_USERNAME / DREAMHOST_SSH_KEY"
+            exit 1
+          fi
+
+          echo "Using host=${DREAMHOST_HOST} user=${DREAMHOST_USERNAME}"
+
+          # Write private key; normalize CRLF and accidental literal \n pastes
+          printf '%s\n' "$DREAMHOST_SSH_KEY" \
+            | tr -d '\r' \
+            | sed 's/\\n/\n/g' \
+            > ~/.ssh/dreamhost_deploy
           chmod 600 ~/.ssh/dreamhost_deploy
 
-          # Force a single identity so ssh does not try other keys and hit
-          # "Too many authentication failures" on DreamHost
+          echo "--- Key file checks (private key is never printed) ---"
+          echo "Key bytes: $(wc -c < ~/.ssh/dreamhost_deploy)"
+          echo "Key lines: $(wc -l < ~/.ssh/dreamhost_deploy)"
+          head -n 1 ~/.ssh/dreamhost_deploy
+          tail -n 1 ~/.ssh/dreamhost_deploy
+
+          # Validate key parses, then show matching public key for DreamHost comparison
+          ssh-keygen -y -f ~/.ssh/dreamhost_deploy > ~/.ssh/dreamhost_deploy.pub
+          echo "Public key that must be authorized for this user on DreamHost:"
+          cat ~/.ssh/dreamhost_deploy.pub
+          echo "Fingerprint:"
+          ssh-keygen -lf ~/.ssh/dreamhost_deploy.pub
+
+          # Force a single identity so ssh does not try other keys
           {
             echo "Host dreamhost"
             echo "  HostName ${DREAMHOST_HOST}"
@@ -63,7 +87,7 @@ jobs:
           chmod 644 ~/.ssh/known_hosts
 
       - name: Test SSH connection
-        run: ssh -o BatchMode=yes -o ConnectTimeout=15 dreamhost 'echo SSH_OK && pwd'
+        run: ssh -vvv -o BatchMode=yes -o ConnectTimeout=15 dreamhost 'echo SSH_OK && pwd'
 
       - name: Deploy to DreamHost via rsync
         env:

@@ -24,6 +24,10 @@
 .DS_Store
 *.pem
 
+# local deploy keys (never commit)
+dreamhost_deploy
+dreamhost_deploy.pub
+
 # debug
 npm-debug.log*
 yarn-debug.log*
