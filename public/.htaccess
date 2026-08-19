@@ -1,0 +1,12 @@
+# DreamHost / Apache rules for the static Next.js export
+
+# Force HTTPS (optional but recommended)
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Preserve the old /project -> /projects redirect
+RedirectMatch 301 ^/project/?$ /projects/
+
+# Prefer trailing-slash URLs that map to exported index.html files
+DirectoryIndex index.html
