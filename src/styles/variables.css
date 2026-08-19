@@ -40,10 +40,10 @@
   --text-primary: var(--color-black);
   --text-secondary: var(--color-grey-600);
 
-  --background-overlay: rgba(255, 255, 255, 0.72);
+  /* Solid white panel surface (HTML .panel) — not frosted glass */
+  --background-overlay: var(--color-white);
 
-  --box-shadow:
-    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
 }
 
 /* @media (prefers-color-scheme: dark) { */

@@ -23,8 +23,6 @@ export default function SponsorsPanel({
   onUpdateSlot,
   onClearSlot,
 }: SponsorsPanelProps) {
-  const filled = sponsors.filter(Boolean).length
-
   async function handleFileChange(
     index: number,
     event: ChangeEvent<HTMLInputElement>
@@ -48,11 +46,6 @@ export default function SponsorsPanel({
       <h2 id="sponsors-heading" className={s.heading}>
         Sponsor Logos
       </h2>
-      <p className={s.hint}>
-        {filled}/{SPONSOR_SLOT_COUNT} slots filled. Upload as many as you have
-        (up to {SPONSOR_SLOT_COUNT}) — only filled slots show on the graphic.
-        Saved in this browser and reused every week.
-      </p>
       <ul className={s.slotList}>
         {sponsors.map((src, index) => (
           <li key={index} className={s.slotRow} data-filled={Boolean(src)}>
@@ -72,7 +65,7 @@ export default function SponsorsPanel({
             {src ? (
               <img src={src} alt="" className={s.thumb} />
             ) : (
-              <span className={s.thumbEmpty} aria-hidden="true" />
+              <span className={s.thumbSlot} aria-hidden="true" />
             )}
             {src ? (
               <button
@@ -84,11 +77,16 @@ export default function SponsorsPanel({
                 ✕
               </button>
             ) : (
-              <span className={s.clearSpacer} aria-hidden="true" />
+              <span className={s.clearSlot} aria-hidden="true" />
             )}
           </li>
         ))}
       </ul>
+      <p className={s.hint}>
+        Upload as many as you have (up to {SPONSOR_SLOT_COUNT}) — only filled
+        slots show, spread evenly along the bottom of both graphics. Saved in
+        this browser and reused every week.
+      </p>
     </section>
   )
 }

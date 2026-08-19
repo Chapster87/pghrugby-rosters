@@ -46,18 +46,10 @@ export default function RosterSlotsPanel({
 
       {ROSTER_SLOT_GROUPS.map((group) => {
         const slots = getRosterSlotsByGroup(group.id)
-        const filled = slots.filter((slot) =>
-          draft.slots[slot.number]?.name?.trim()
-        ).length
 
         return (
           <div key={group.id} className={s.group}>
-            <h2 className={s.heading}>
-              Roster — {group.label}
-              <span className={s.count}>
-                {filled}/{slots.length}
-              </span>
-            </h2>
+            <h2 className={s.heading}>Roster — {group.label}</h2>
             <ul className={s.slotList}>
               {slots.map((slot) => {
                 const value = draft.slots[slot.number] ?? {
@@ -75,24 +67,19 @@ export default function RosterSlotsPanel({
                     <span className={s.jersey} aria-hidden="true">
                       {slot.number}
                     </span>
-                    <label className={s.srOnly} htmlFor={`pos-${slot.number}`}>
-                      Position for jersey {slot.number}
-                    </label>
                     <input
                       id={`pos-${slot.number}`}
                       type="text"
                       className={s.posInput}
                       value={value.position}
                       placeholder={slot.position}
+                      aria-label={`Position for jersey ${slot.number}`}
                       onChange={(event) =>
                         onSlotChange(slot.number, {
                           position: event.target.value,
                         })
                       }
                     />
-                    <label className={s.srOnly} htmlFor={`name-${slot.number}`}>
-                      Player name for jersey {slot.number}
-                    </label>
                     <input
                       id={`name-${slot.number}`}
                       type="text"
@@ -101,6 +88,7 @@ export default function RosterSlotsPanel({
                       value={value.name}
                       placeholder="Player name"
                       autoComplete="off"
+                      aria-label={`Player name for jersey ${slot.number}`}
                       onChange={(event) =>
                         onSlotChange(slot.number, {
                           name: event.target.value,
@@ -110,7 +98,7 @@ export default function RosterSlotsPanel({
                     {photoUrl ? (
                       <img src={photoUrl} alt="" className={s.thumb} />
                     ) : (
-                      <span className={s.thumbPlaceholder} aria-hidden="true" />
+                      <span className={s.thumbSlot} aria-hidden="true" />
                     )}
                   </li>
                 )

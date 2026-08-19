@@ -2,8 +2,6 @@
 
 import { useMemo, useState, type FormEvent } from "react"
 
-import Button from "@/components/button"
-
 import type { PlayerLibrary } from "../../_static/builder-types"
 import { toDriveDirectLink } from "../../_helpers/drive-url"
 
@@ -77,9 +75,9 @@ export default function PlayerLibraryPanel({
           />
         </label>
         <div className={s.addAction}>
-          <Button type="submit" size="small">
+          <button type="submit" className={s.addBtn}>
             Add
-          </Button>
+          </button>
         </div>
       </form>
 

@@ -5,14 +5,15 @@
   gap: 8px;
   font-weight: 700;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   outline: none;
   transition:
     background-color 0.2s ease,
     color 0.2s ease;
   cursor: pointer;
-  padding: 16px 24px;
-  font-size: 1rem;
+  /* Match HTML builder buttons */
+  padding: 8px 14px;
+  font-size: 12px;
   text-decoration: none;
   text-transform: uppercase;
   letter-spacing: 0.4px;
@@ -47,18 +48,19 @@
 
 /* HTML .btn-ghost: light fill, dark type */
 .secondary {
-  background-color: var(--color-grey-200);
-  color: var(--color-grey-800);
+  background-color: #eee;
+  color: #333;
 
   &:hover {
-    background-color: var(--color-grey-300);
+    background-color: #e2e2e2;
     color: var(--color-black);
   }
 }
 
 .small {
-  padding: 4px 8px;
-  font-size: 14px;
+  padding: 8px 14px;
+  font-size: 12px;
+  min-height: 36px;
 }
 
 .large {

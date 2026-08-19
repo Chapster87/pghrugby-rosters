@@ -1,41 +1,49 @@
 .section {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  padding: 16px;
-  background-color: var(--background-overlay);
-  border-radius: 8px;
+  gap: 0;
 }
 
 .block {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 0;
 }
 
 .heading {
-  margin: 0;
+  margin: 22px 0 12px;
+  padding-bottom: 6px;
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.6px;
   text-transform: uppercase;
   color: var(--color-black);
+  border-bottom: 2px solid var(--color-primary);
+}
+
+.block:first-child .heading {
+  margin-top: 0;
 }
 
 .logoUpload {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
+  margin-bottom: 6px;
 }
 
+/* HTML .logo-preview: light dashed tile, not black/gold frame */
 .logoPreview {
   flex: 0 0 auto;
   width: 64px;
   height: 64px;
   border-radius: 8px;
   overflow: hidden;
-  background-color: var(--color-black);
-  border: 2px solid var(--color-primary);
+  background-color: #f1f1f1;
+  border: 1px dashed #bbb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .logoImage {
@@ -48,7 +56,7 @@
 .logoControls {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
   min-width: 0;
 }
 
@@ -73,26 +81,27 @@
 .field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
   min-width: 0;
+  margin-bottom: 10px;
 }
 
 .label {
   font-size: 12px;
   font-weight: 600;
-  color: var(--color-grey-700);
+  color: #444;
 }
 
 .input {
   width: 100%;
-  min-height: 40px;
-  padding: 8px 12px;
-  border: 1px solid var(--color-grey-300);
-  border-radius: 8px;
+  min-height: 36px;
+  padding: 7px 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
   background-color: var(--color-white);
   color: var(--color-black);
   font: inherit;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .input:focus {
@@ -103,16 +112,20 @@
 .row2 {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 12px;
+  gap: 10px;
 
   @media (--viewport-sm-up) {
     grid-template-columns: 1fr 1fr;
+  }
+
+  & .field {
+    margin-bottom: 10px;
   }
 }
 
 .note {
   margin: 0;
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1.4;
-  color: var(--color-grey-600);
+  color: #666;
 }

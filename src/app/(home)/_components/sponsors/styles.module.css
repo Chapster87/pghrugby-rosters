@@ -1,26 +1,25 @@
 .section {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
-  background-color: var(--background-overlay);
-  border-radius: 8px;
+  gap: 0;
 }
 
 .heading {
-  margin: 0;
+  margin: 22px 0 12px;
+  padding-bottom: 6px;
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.6px;
   text-transform: uppercase;
   color: var(--color-black);
+  border-bottom: 2px solid var(--color-primary);
 }
 
 .hint {
-  margin: 0;
-  font-size: 13px;
+  margin: 8px 0 0;
+  font-size: 11px;
   line-height: 1.4;
-  color: var(--color-grey-600);
+  color: #666;
 }
 
 .slotList {
@@ -29,13 +28,14 @@
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
+/* HTML .sponsor-slot-row */
 .slotRow {
   display: grid;
-  grid-template-columns: 32px 1fr 40px 24px;
-  gap: 8px;
+  grid-template-columns: 34px 1fr 34px 24px;
+  gap: 6px;
   align-items: center;
 }
 
@@ -43,13 +43,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
+  width: 100%;
+  min-height: 34px;
+  padding: 7px 0;
+  border-radius: 6px;
   background-color: var(--color-black);
-  color: var(--color-white);
+  color: var(--color-primary);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1;
 }
 
 .fileLabel {
@@ -58,25 +61,23 @@
 
 .fileInput {
   width: 100%;
-  font-size: 12px;
+  font-size: 11px;
   color: var(--color-grey-700);
 }
 
+/* Thumb + clear visible only when filled; empty slots keep grid columns. */
 .thumb {
-  width: 40px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 4px;
   object-fit: contain;
-  background-color: var(--color-grey-100);
-  border: 1px solid var(--color-grey-300);
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
 }
 
-.thumbEmpty {
-  width: 40px;
-  height: 32px;
-  border-radius: 4px;
-  background-color: var(--color-grey-100);
-  border: 1px dashed var(--color-grey-300);
+.thumbSlot {
+  width: 34px;
+  height: 34px;
 }
 
 .clearBtn {
@@ -87,18 +88,13 @@
   height: 24px;
   padding: 0;
   border: none;
-  background: transparent;
-  color: var(--color-danger);
+  background: none;
+  color: #a12727;
   font-size: 14px;
   cursor: pointer;
 }
 
-.clearBtn:hover {
-  background-color: var(--color-grey-100);
-  border-radius: 4px;
-}
-
-.clearSpacer {
+.clearSlot {
   width: 24px;
   height: 24px;
 }

@@ -11,7 +11,9 @@ pnpm install
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000) — the homepage **is** the builder.
+
+Static hosting (DreamHost): `pnpm build` emits an export under `out/` (see `next.config.ts` `output: "export"`).
 
 ## What it does
 

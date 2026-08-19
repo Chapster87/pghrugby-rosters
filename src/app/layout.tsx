@@ -17,10 +17,18 @@ const merriweatherSans = Merriweather_Sans({
 })
 
 export const metadata: Metadata = {
-  title: "Pittsburgh Forge — Weekly Roster Builder",
+  title: {
+    default: "Pittsburgh Forge — Weekly Roster Builder",
+    template: "%s · Pittsburgh Forge Roster Builder",
+  },
   description:
-    "Build weekly matchday roster graphics for Pittsburgh Forge rugby social media.",
+    "Client-side Matchday Squad builder for Pittsburgh Forge rugby — Portrait and Story PNG export for social.",
   applicationName: "Pittsburgh Forge Roster Builder",
+  authors: [{ name: "Pittsburgh Forge" }],
+  robots: {
+    index: false,
+    follow: false,
+  },
   icons: {
     icon: [{ url: "/images/pittsburgh-forge-crest.png", type: "image/png" }],
     apple: [{ url: "/images/pittsburgh-forge-crest.png", type: "image/png" }],
