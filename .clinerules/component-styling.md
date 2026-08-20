@@ -16,6 +16,44 @@ This set of guidelines outlines the preferred approach for creating and styling 
 - Use the `composes` feature when needed to inherit global styles
 - Use global typography classes for heading or text-related elements when not consuming global Heading or Text components
 
+### Nest related rules
+
+Prefer nesting for readability instead of repeating parent selectors. Nest media queries inside the selector they modify.
+
+Use `&` only when the nested selector must attach to the parent (compound class, pseudo-class, attribute). For plain descendants, omit `&` — `& .child` is redundant with `.child`.
+
+```css
+/* Good */
+.root {
+  padding: 16px;
+
+  .header {
+    display: flex;
+  }
+
+  &[data-format="portrait"] {
+    .title {
+      font-size: 24px;
+    }
+  }
+
+  &.isExporting {
+    opacity: 0.8;
+  }
+
+  @media (--viewport-medium-up) {
+    padding: 24px;
+  }
+}
+
+/* Avoid — redundant & before descendants */
+.root {
+  & .header {
+    display: flex;
+  }
+}
+```
+
 ### Use our global color vars
 
 Read: src/styles/colors.css for the full list of available color variables.

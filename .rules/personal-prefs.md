@@ -1,4 +1,4 @@
 # Personal Preferences
 
-- **CSS Nesting**: Prefer nesting css rules for readability rather than repeating class names, but also avoid extrenuous use of nesting for no reason
-- **Media Query Nesting**: Nest media quiering inside of macthing css selctors for readability
+- **CSS Nesting**: Prefer nesting CSS rules for readability rather than repeating class names, but avoid extraneous nesting. See `.rules/component-styling.md` (“Nest related rules”) for `&` usage.
+- **Media Query Nesting**: Nest media queries inside the matching CSS selectors for readability.

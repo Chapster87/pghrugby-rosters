@@ -10,6 +10,7 @@ import {
   getRosterSlotsByGroup,
   type RosterSlotGroup,
 } from "../../../../_static/roster-slots"
+import { LEAGUE_LABEL } from "../../../../../_static/cloud-roster"
 import { corsModeForImageSrc } from "../../../../_helpers/export-png"
 import { formatMatchDate } from "../../../../_helpers/format-match-date"
 import { resolveSlotPhotoSrc } from "../../../../_helpers/resolve-slot-photo"
@@ -136,8 +137,12 @@ export default function MatchdayGraphic({
   exportRootId,
 }: MatchdayGraphicProps) {
   const opponent = draft.opponent.trim() || "TBD Opponent"
+  // Home → vs, Away → @ (same convention as buildAutoTitle).
+  const matchupMarker = draft.venue === "Away" ? "@" : "vs"
   const dateStr = formatMatchDate(draft.matchDate)
   const kickoff = draft.kickoff.trim()
+  // Stored id is mens|womens; graphic shows the display label (Men's / Women's).
+  const leagueLabel = draft.league ? LEAGUE_LABEL[draft.league] : ""
   const division = draft.division.trim()
   const address = draft.address.trim()
   const filledSponsors = sponsors.filter(Boolean)
@@ -186,26 +191,25 @@ export default function MatchdayGraphic({
         </div>
         <div className={s.titles}>
           <p className={s.clubName}>PITTSBURGH FORGE</p>
-          <p className={s.graphicTitle}>Matchday Squad</p>
+          <p className={s.subTitle}>
+            {[leagueLabel, division].filter(Boolean).join(" ")}
+            <span className={s.matchup}>
+              {matchupMarker} {opponent}
+            </span>
+          </p>
         </div>
         <div className={s.match}>
-          <div>
-            <b>vs</b> {opponent}
-          </div>
           <div>
             {dateStr}
             {kickoff ? ` · ${kickoff}` : ""}
           </div>
-          <div>
-            {draft.venue}
-            {division ? ` · ${division}` : ""}
-          </div>
+          <div>{draft.venue}</div>
           {address ? <div className={s.address}>{address}</div> : null}
         </div>
       </header>
 
       <section className={s.group}>
-        <h3 className={s.groupTitle}>Starting Lineup</h3>
+        <h3 className={s.groupTitle}>Starters</h3>
         <div className={`${s.grid} ${s.gridStarters}`}>
           {starters.map((slot) => (
             <SlotCell

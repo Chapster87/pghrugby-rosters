@@ -1,5 +1,10 @@
 import type { Metadata } from "next"
-import { Inter, Merriweather_Sans } from "next/font/google"
+import {
+  Bakbak_One,
+  Inter,
+  Merriweather_Sans,
+  Montserrat,
+} from "next/font/google"
 import Header from "@/components/header"
 import BreakpointIndicator from "@components/breakpoint-indicator"
 import "@styles/globals.css"
@@ -14,6 +19,18 @@ const merriweatherSans = Merriweather_Sans({
   variable: "--font-merriweather-sans",
   subsets: ["latin"],
   weight: ["600", "700", "800"],
+})
+/** Display title face for Matchday graphic. Variable only — apply per surface. */
+const bakbakOne = Bakbak_One({
+  variable: "--font-bakbak-one",
+  subsets: ["latin"],
+  weight: "400",
+})
+/** Group heading face for Matchday graphic. Variable only — apply per surface. */
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
 })
 
 export const metadata: Metadata = {
@@ -43,7 +60,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${merriweatherSans.variable}`}
+      className={`${inter.variable} ${merriweatherSans.variable} ${bakbakOne.variable} ${montserrat.variable}`}
     >
       <body data-theme="light">
         <BreakpointIndicator />
