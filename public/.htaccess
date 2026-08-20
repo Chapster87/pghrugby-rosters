@@ -7,3 +7,11 @@ RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
 # Prefer trailing-slash URLs that map to exported index.html files
 DirectoryIndex index.html
+
+# Serve the exported Roster shell for unknown /roster/<uuid>/ share links.
+# The [id] route builds one template (nil-UUID sentinel); the client reads
+# the real id from the URL, so any UUID path boots the same shell. Real
+# files/dirs (e.g. /roster/new/) are never rewritten.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^roster/([^/]+)/?$ /roster/00000000-0000-0000-0000-000000000000/index.html [L]
