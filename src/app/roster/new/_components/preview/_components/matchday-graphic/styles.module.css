@@ -80,11 +80,11 @@
 }
 
 .group {
-  padding: 6px 46px 0;
+  padding: 8px 46px 0;
 }
 
 .groupTitle {
-  margin: 0 0 6px;
+  margin: 0 0 8px;
   font-size: 24px;
   font-weight: 900;
   color: var(--color-danger);
@@ -94,28 +94,29 @@
 
 .grid {
   display: grid;
-  gap: 6px;
+  gap: 12px 8px;
 }
 
-.grid8 {
-  grid-template-columns: repeat(8, 1fr);
+/* Starting lineup 1–15: three rows of five */
+.gridStarters {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
-.grid7 {
-  grid-template-columns: repeat(7, 1fr);
-}
-
-.gridFlex {
+/*
+ * Finishers: one row of eight equal slots. Partial benches keep the same
+ * slot width and center in the row (flex, not a stretched 8-col grid).
+ */
+.gridFinishers {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  column-gap: 14px;
-  row-gap: 20px;
+  column-gap: 8px;
+  row-gap: 16px;
 }
 
-.gridFlex .slot {
-  flex: 0 0 calc(25% - 10.5px);
-  max-width: calc(25% - 10.5px);
+.gridFinishers .slot {
+  flex: 0 0 calc((100% - 56px) / 8);
+  max-width: calc((100% - 56px) / 8);
   box-sizing: border-box;
 }
 
@@ -134,6 +135,7 @@
   object-fit: cover;
   background: #333;
   display: block;
+  margin: 0 auto;
 }
 
 .jersey {
@@ -208,43 +210,67 @@
 }
 
 /*
- * Portrait 1080x1350 — same canvas width as legacy square, so horizontal
- * headshot density matches HTML (120px photos, 6px gap, 46px side pad).
- * Extra height is used vertically (finishers push).
+ * Portrait / Post 1080x1350 — 5-across starters get larger headshots;
+ * 8-across finishers stay tighter so one bench row fits the canvas width.
  */
 .root[data-format="portrait"] {
-  & .photo {
-    width: 120px;
-    height: 120px;
+  & .gridStarters .photo {
+    width: 144px;
+    height: 144px;
     border: 4px solid var(--color-primary);
   }
 
-  & .jersey {
+  & .gridStarters .jersey {
     bottom: -4px;
     right: -4px;
-    width: 34px;
-    height: 34px;
-    font-size: 15px;
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
     border-width: 2px;
   }
 
-  & .name {
-    font-size: 14px;
+  & .gridStarters .name {
+    font-size: 16px;
     margin-top: 4px;
     line-height: 1.1;
   }
 
-  & .position {
+  & .gridStarters .position {
+    font-size: 12px;
+  }
+
+  & .gridFinishers .photo {
+    width: 96px;
+    height: 96px;
+    border: 4px solid var(--color-primary);
+  }
+
+  & .gridFinishers .jersey {
+    bottom: -4px;
+    right: -4px;
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+    border-width: 2px;
+  }
+
+  & .gridFinishers .name {
+    font-size: 12px;
+    margin-top: 4px;
+    line-height: 1.1;
+  }
+
+  & .gridFinishers .position {
     font-size: 10px;
   }
 
-  /* Extra feed height: push single-row finishers toward the sponsor strip */
+  /* Single-row finishers: close the gap above the sponsor strip */
   & .groupFinishers.rows1 {
-    margin-top: 200px;
+    margin-top: 32px;
   }
 
   & .groupFinishers.rows2 {
-    margin-top: 0;
+    margin-top: 16px;
   }
 
   & .sponsors {
@@ -292,48 +318,87 @@
   z-index: 1;
 }
 
-/* ---- Story 1080×1920 (parity with HTML story sizes) ---- */
+/* ---- Story 1080×1920 — same 5 + 8 layout, larger type and headshots ---- */
 .root[data-format="story"] {
-  & .grid8,
-  & .grid7 {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
   & .group {
     padding: 16px 46px 0;
   }
 
-  & .photo {
-    width: 160px;
-    height: 160px;
-    border: 5px solid var(--color-primary);
+  & .groupTitle {
+    font-size: 28px;
+    margin-bottom: 12px;
   }
 
-  & .jersey {
-    bottom: -6px;
-    right: -6px;
+  & .grid {
+    gap: 16px 8px;
+  }
+
+  & .gridStarters .photo {
+    width: 168px;
+    height: 168px;
+    border: 4px solid var(--color-primary);
+  }
+
+  & .gridStarters .jersey {
+    bottom: -4px;
+    right: -4px;
     width: 44px;
     height: 44px;
     font-size: 20px;
-    border-width: 3px;
+    border-width: 4px;
   }
 
-  & .name {
-    font-size: 18px;
+  & .gridStarters .name {
+    font-size: 16px;
     margin-top: 4px;
     line-height: 1.15;
   }
 
-  & .position {
-    font-size: 13px;
+  & .gridStarters .position {
+    font-size: 12px;
+  }
+
+  & .gridFinishers {
+    column-gap: 8px;
+    row-gap: 16px;
+  }
+
+  & .gridFinishers .slot {
+    flex-basis: calc((100% - 56px) / 8);
+    max-width: calc((100% - 56px) / 8);
+  }
+
+  & .gridFinishers .photo {
+    width: 104px;
+    height: 104px;
+    border: 4px solid var(--color-primary);
+  }
+
+  & .gridFinishers .jersey {
+    bottom: -4px;
+    right: -4px;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    border-width: 2px;
+  }
+
+  & .gridFinishers .name {
+    font-size: 12px;
+    margin-top: 4px;
+    line-height: 1.15;
+  }
+
+  & .gridFinishers .position {
+    font-size: 12px;
   }
 
   & .groupFinishers.rows1 {
-    margin-top: 48px;
+    margin-top: 56px;
   }
 
   & .groupFinishers.rows2 {
-    margin-top: 16px;
+    margin-top: 24px;
   }
 
   & .sponsors {
