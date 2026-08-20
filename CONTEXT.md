@@ -4,9 +4,13 @@ Client-side tool for building weekly matchday roster graphics for Pittsburgh For
 
 ## Language
 
+**Roster**:
+The working document: Match Details, Matchday Squad (Roster Slots), branding, and related builder state. Autosaved locally in the browser; Save pushes or updates a cloud-backed copy. Listed on the landing page and opened via a normal app URL by id.
+_Avoid_: Draft (retired product noun), save file, document (when naming the product entity)
+
 **Matchday Squad**:
-The full set of players named for a match, shown on the graphic.
-_Avoid_: Team sheet (unless quoting external rugby usage), lineup card, roster (as a product noun)
+The full set of players named for a match, shown on the graphic. Content inside a Roster, not the saved document itself.
+_Avoid_: Team sheet (unless quoting external rugby usage), lineup card
 
 **Roster Slot**:
 A numbered place on the Matchday Squad with a position label and optional player name. Slots 1–15 are fixed; finishers are dynamic from jersey 16 upward.
@@ -32,6 +36,10 @@ _Avoid_: Team badge (unless UI copy), favicon
 A logo image in one of a fixed set of sponsor slots on the graphic.
 _Avoid_: Partner mark, advert
 
+**League-default Sponsors**:
+The shared per-League template of Sponsor logos (Men's or Women's) that new Rosters snapshot from. Edited by Operators; stored in the cloud, not per-Roster until copied onto a Roster.
+_Avoid_: Global sponsors, default branding (when meaning only sponsor logos)
+
 **League**:
 Which Forge program a Matchday Squad belongs to: Men’s or Women’s. Required on every cloud save. Distinct from Match Type value “League.”
 _Avoid_: Side, team (when meaning men/women), gender
@@ -53,21 +61,17 @@ Full-bleed image behind the Matchday Squad graphic. One shared default for all G
 _Avoid_: Wallpaper, canvas background
 
 **Graphic Format**:
-A fixed export size for social: Portrait (1080×1350, Instagram feed standard) or Story (1080×1920).
-_Avoid_: Canvas size, preset, template size, Square (unless quoting legacy HTML; the feed format is Portrait, not 1:1)
-
-**Draft**:
-The working Match Details, Roster Slots, branding, and related builder state. Autosaved locally in the browser; Save pushes or updates a cloud-backed copy.
-_Avoid_: Save file, document, roster (as a product noun)
+A fixed export size for social: Post (1080×1350, Instagram feed) or Story (1080×1920).
+_Avoid_: Portrait (retired product name), canvas size, preset, template size, Square (not 1:1; the feed format is Post)
 
 **Export**:
 Downloading a Graphic Format as a PNG for social posting.
 _Avoid_: Render, screenshot (except when describing implementation)
 
 **Operator**:
-An invited person who may create, edit, save, and delete cloud Drafts (Forge coach/admin). Sign-in is required for writes.
+An invited person who may create, edit, save, and delete cloud Rosters (Forge coach/admin). Sign-in is required for writes.
 _Avoid_: User (when domain-specific), admin, editor
 
 **Reviewer**:
-Anyone with the Draft’s normal app URL who may view it read-only without signing in.
+Anyone with the Roster’s normal app URL who may view it read-only without signing in.
 _Avoid_: Public user, guest editor
