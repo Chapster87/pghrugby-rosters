@@ -153,18 +153,54 @@ export function clearDraftStorage(): void {
   removeRaw(STORAGE_KEYS.draft)
 }
 
-export function loadPlayerLibrary(): PlayerLibrary {
+/** Per-League local cache: `{ mens: {name: url}, womens: {name: url} }`. */
+type LeagueLibraryMap = Partial<Record<LeagueId, PlayerLibrary>>
+
+function normalizeLeagueLibrary(raw: unknown): LeagueLibraryMap {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return {}
+  const record = raw as Record<string, unknown>
+  if (record.mens || record.womens) {
+    const out: LeagueLibraryMap = {}
+    for (const league of ["mens", "womens"] as const) {
+      const value = record[league]
+      if (value && typeof value === "object" && !Array.isArray(value)) {
+        out[league] = normalizePlayerLibrary(value)
+      }
+    }
+    return out
+  }
+  // Legacy flat map (name → url) predates leagues; men's is the primary pool.
+  return { mens: normalizePlayerLibrary(record) }
+}
+
+export function loadPlayerLibrary(league: LeagueId): PlayerLibrary {
   const raw = readRaw(STORAGE_KEYS.playerLibrary)
   if (!raw) return createEmptyPlayerLibrary()
   try {
-    return normalizePlayerLibrary(JSON.parse(raw))
+    return (
+      normalizeLeagueLibrary(JSON.parse(raw))[league] ??
+      createEmptyPlayerLibrary()
+    )
   } catch {
     return createEmptyPlayerLibrary()
   }
 }
 
-export function savePlayerLibrary(library: PlayerLibrary): void {
-  writeRaw(STORAGE_KEYS.playerLibrary, JSON.stringify(library))
+export function savePlayerLibrary(
+  league: LeagueId,
+  library: PlayerLibrary
+): void {
+  const raw = readRaw(STORAGE_KEYS.playerLibrary)
+  let all: LeagueLibraryMap = {}
+  if (raw) {
+    try {
+      all = normalizeLeagueLibrary(JSON.parse(raw))
+    } catch {
+      all = {}
+    }
+  }
+  all[league] = library
+  writeRaw(STORAGE_KEYS.playerLibrary, JSON.stringify(all))
 }
 
 export function loadSponsors(): Sponsors {
@@ -192,4 +228,17 @@ export function saveClubLogo(dataUrl: string | null): void {
     return
   }
   writeRaw(STORAGE_KEYS.clubLogo, dataUrl)
+}
+
+export function loadBackgroundImage(): string | null {
+  const raw = readRaw(STORAGE_KEYS.backgroundImage)
+  return raw && raw.length > 0 ? raw : null
+}
+
+export function saveBackgroundImage(url: string | null): void {
+  if (!url) {
+    removeRaw(STORAGE_KEYS.backgroundImage)
+    return
+  }
+  writeRaw(STORAGE_KEYS.backgroundImage, url)
 }

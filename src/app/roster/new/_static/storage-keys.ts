@@ -7,6 +7,7 @@ export const STORAGE_KEYS = {
   playerLibrary: "pghrugby.playerLibrary",
   sponsors: "pghrugby.sponsors",
   clubLogo: "pghrugby.clubLogo",
+  backgroundImage: "pghrugby.backgroundImage",
 } as const
 
 export type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS]

@@ -5,8 +5,14 @@
  * and they often block hotlinking. Routing through images.weserv.nl returns the same
  * photo in a form that is reliably embeddable (and CORS-friendly for html2canvas).
  * Non-Drive URLs pass through unchanged.
+ *
+ * Every image in the app flows through here (player photos, background, sponsors,
+ * club logo) so the later Cloudinary migration swaps a single function.
+ *
+ * @param maxWidth Drive thumbnail width (w1000 suits headshots; larger for
+ *   full-bleed background images). Ignored for non-Drive URLs.
  */
-export function toDriveDirectLink(url: string): string {
+export function toDriveDirectLink(url: string, maxWidth = 1000): string {
   const trimmed = (url || "").trim()
   if (!trimmed) return trimmed
 
@@ -15,7 +21,7 @@ export function toDriveDirectLink(url: string): string {
     trimmed.match(/[?&]id=([a-zA-Z0-9_-]+)/)
 
   if (match?.[1]) {
-    const driveUrl = `drive.google.com/thumbnail?id=${match[1]}&sz=w1000`
+    const driveUrl = `drive.google.com/thumbnail?id=${match[1]}&sz=w${maxWidth}`
     return `https://images.weserv.nl/?url=${encodeURIComponent(driveUrl)}`
   }
 

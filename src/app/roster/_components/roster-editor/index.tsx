@@ -4,6 +4,8 @@ import type { ReactNode } from "react"
 
 import type { UseBuilderStateResult } from "../../new/hooks/use-builder-state"
 import MatchDetailsPanel from "../../new/_components/match-details"
+import BackgroundImagePanel from "../../new/_components/background-image"
+import ClubLogoPanel from "../../new/_components/club-logo"
 import PlayerLibraryPanel from "../../new/_components/player-library"
 import PreviewPanel from "../../new/_components/preview"
 import RosterSlotsPanel from "../../new/_components/roster-slots"
@@ -29,13 +31,12 @@ export default function RosterEditor({ builder, actions }: RosterEditorProps) {
         <MatchDetailsPanel
           value={builder.draft}
           onChange={builder.updateMatchDetails}
-          clubLogoSrc={builder.clubLogoSrc}
-          onClubLogoChange={builder.setClubLogo}
         />
 
         <PlayerLibraryPanel
           library={builder.playerLibrary}
           clubLogoSrc={builder.clubLogoSrc}
+          league={builder.draft.league}
           onUpsert={builder.upsertPlayerLibraryEntry}
           onRemove={builder.removePlayerLibraryEntry}
         />
@@ -46,10 +47,26 @@ export default function RosterEditor({ builder, actions }: RosterEditorProps) {
           onSlotChange={builder.updateRosterSlot}
         />
 
+        <ClubLogoPanel
+          value={builder.clubLogo}
+          clubLogoSrc={builder.clubLogoSrc}
+          onChange={builder.setClubLogo}
+        />
+
         <SponsorsPanel
           sponsors={builder.sponsors}
+          isCustom={builder.sponsorsIsCustom}
+          league={builder.draft.league}
           onUpdateSlot={builder.updateSponsorSlot}
           onClearSlot={builder.clearSponsorSlot}
+          onReorder={builder.reorderSponsors}
+          onUseLeagueDefaults={builder.useLeagueDefaults}
+          onSaveLeagueDefaults={builder.saveLeagueDefaults}
+        />
+
+        <BackgroundImagePanel
+          value={builder.backgroundImage}
+          onChange={builder.setBackgroundImage}
         />
 
         {actions ? <div className={s.actions}>{actions}</div> : null}
@@ -61,6 +78,7 @@ export default function RosterEditor({ builder, actions }: RosterEditorProps) {
           playerLibrary={builder.playerLibrary}
           sponsors={builder.sponsors}
           clubLogoSrc={builder.clubLogoSrc}
+          backgroundImage={builder.backgroundImage}
           activeFormat={builder.activeFormat}
           onFormatChange={builder.setActiveFormat}
         />

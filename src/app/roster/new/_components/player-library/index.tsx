@@ -4,12 +4,15 @@ import { useMemo, useState, type FormEvent } from "react"
 
 import type { PlayerLibrary } from "../../_static/builder-types"
 import { toDriveDirectLink } from "../../_helpers/drive-url"
+import { LEAGUE_LABEL, type LeagueId } from "../../../_static/cloud-roster"
 
 import s from "./styles.module.css"
 
 type PlayerLibraryPanelProps = {
   library: PlayerLibrary
   clubLogoSrc: string
+  /** Active Roster League — the library is split per League. */
+  league: LeagueId | ""
   onUpsert: (name: string, photoUrl: string) => void
   onRemove: (name: string) => void
 }
@@ -21,6 +24,7 @@ type PlayerLibraryPanelProps = {
 export default function PlayerLibraryPanel({
   library,
   clubLogoSrc,
+  league,
   onUpsert,
   onRemove,
 }: PlayerLibraryPanelProps) {
@@ -32,6 +36,20 @@ export default function PlayerLibraryPanel({
     () => Object.keys(library).sort((a, b) => a.localeCompare(b)),
     [library]
   )
+
+  if (!league) {
+    return (
+      <section className={s.section} aria-labelledby="player-library-heading">
+        <h2 id="player-library-heading" className={s.heading}>
+          Player Photo Library
+        </h2>
+        <p className={s.empty}>
+          Choose a League in Match Details first — the photo library is split by
+          League.
+        </p>
+      </section>
+    )
+  }
 
   function handleAdd(event: FormEvent) {
     event.preventDefault()
@@ -50,7 +68,7 @@ export default function PlayerLibraryPanel({
   return (
     <section className={s.section} aria-labelledby="player-library-heading">
       <h2 id="player-library-heading" className={s.heading}>
-        Player Photo Library
+        Player Photo Library · {LEAGUE_LABEL[league]}
       </h2>
 
       <form className={s.addRow} onSubmit={handleAdd}>
@@ -120,6 +138,10 @@ export default function PlayerLibraryPanel({
       <p className={s.note}>
         Once a player&apos;s added, pick them from the roster below and the
         photo fills in automatically.
+      </p>
+      <p className={s.note}>
+        {LEAGUE_LABEL[league]} pool — Men&apos;s and Women&apos;s libraries stay
+        separate.
       </p>
     </section>
   )

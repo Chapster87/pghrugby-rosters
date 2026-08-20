@@ -4,38 +4,22 @@ import type { ChangeEvent } from "react"
 
 import type { LeagueId } from "../../../_static/cloud-roster"
 import type { MatchDetails, Venue } from "../../_static/builder-types"
-import { readImageFileAsDataUrl } from "../../_helpers/read-image-file"
 
 import s from "./styles.module.css"
 
 type MatchDetailsPanelProps = {
   value: MatchDetails
   onChange: (patch: Partial<MatchDetails>) => void
-  clubLogoSrc: string
-  onClubLogoChange: (dataUrl: string | null) => void
 }
 
 /**
- * Match Details + Club Logo controls.
- * Club Logo upload is saved in the browser and reused every week.
+ * Match Details controls. The Club Logo lives in its own panel above Sponsors
+ * (paste-only; upload returns with the Cloudinary migration).
  */
 export default function MatchDetailsPanel({
   value,
   onChange,
-  clubLogoSrc,
-  onClubLogoChange,
 }: MatchDetailsPanelProps) {
-  async function handleLogoChange(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0]
-    if (!file) return
-    try {
-      const dataUrl = await readImageFileAsDataUrl(file)
-      onClubLogoChange(dataUrl)
-    } catch {
-      // Ignore unreadable files; Operator can retry.
-    }
-  }
-
   function handleVenueChange(event: ChangeEvent<HTMLSelectElement>) {
     const next = event.target.value
     if (next === "Home" || next === "Away") {
@@ -52,30 +36,6 @@ export default function MatchDetailsPanel({
 
   return (
     <section className={s.section} aria-labelledby="match-details-heading">
-      <div className={s.block}>
-        <h2 className={s.heading}>Club Logo</h2>
-        <div className={s.logoUpload}>
-          <div className={s.logoPreview}>
-            <img src={clubLogoSrc} alt="Club Logo" className={s.logoImage} />
-          </div>
-          <div className={s.logoControls}>
-            <label className={s.fileLabel}>
-              <span className={s.fileLabelText}>Upload logo</span>
-              <input
-                type="file"
-                accept="image/*"
-                className={s.fileInput}
-                onChange={handleLogoChange}
-              />
-            </label>
-            <p className={s.note}>
-              Upload once — it&apos;s saved in this browser and reused every
-              week.
-            </p>
-          </div>
-        </div>
-      </div>
-
       <div className={s.block}>
         <h2 id="match-details-heading" className={s.heading}>
           Match Details

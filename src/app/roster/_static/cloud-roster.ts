@@ -36,6 +36,8 @@ export type CloudRosterState = {
     /** URL or site path strings only — no `data:` URLs in cloud rows. */
     club_logo: string | null
     sponsors: string[]
+    /** False = working sponsor set follows league defaults; true = custom. */
+    sponsors_is_custom: boolean
     background_image: string | null
     story_background_image: string | null
   }

@@ -36,6 +36,7 @@ type PreviewPanelProps = {
   playerLibrary: PlayerLibrary
   sponsors: Sponsors
   clubLogoSrc: string
+  backgroundImage: string | null
   activeFormat: GraphicFormatId
   onFormatChange: (format: GraphicFormatId) => void
 }
@@ -50,6 +51,7 @@ export default function PreviewPanel({
   playerLibrary,
   sponsors,
   clubLogoSrc,
+  backgroundImage,
   activeFormat,
   onFormatChange,
 }: PreviewPanelProps) {
@@ -178,6 +180,7 @@ export default function PreviewPanel({
                 playerLibrary={playerLibrary}
                 sponsors={sponsors}
                 clubLogoSrc={clubLogoSrc}
+                backgroundImage={backgroundImage}
                 format={active}
                 exportRootId={MATCHDAY_GRAPHIC_EXPORT_ROOT_ID}
               />

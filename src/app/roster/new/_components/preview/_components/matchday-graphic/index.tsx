@@ -23,6 +23,8 @@ export type MatchdayGraphicProps = {
   playerLibrary: PlayerLibrary
   sponsors: Sponsors
   clubLogoSrc: string
+  /** Background Image URL (Drive-converted), or null for the default. */
+  backgroundImage: string | null
   format: GraphicFormat
   /** Optional DOM id for Export capture (stable root; no scale transform). */
   exportRootId?: string
@@ -79,6 +81,7 @@ export default function MatchdayGraphic({
   playerLibrary,
   sponsors,
   clubLogoSrc,
+  backgroundImage,
   format,
   exportRootId,
 }: MatchdayGraphicProps) {
@@ -99,6 +102,19 @@ export default function MatchdayGraphic({
       role="img"
       aria-label={`Matchday Squad graphic, ${format.label} ${format.width} by ${format.height}`}
     >
+      {backgroundImage ? (
+        <img
+          src={backgroundImage}
+          alt=""
+          className={s.background}
+          draggable={false}
+          crossOrigin={corsModeForImageSrc(backgroundImage)}
+          onError={(event) => {
+            // A broken backdrop is worse than the default gradient.
+            event.currentTarget.style.display = "none"
+          }}
+        />
+      ) : null}
       <header className={s.header}>
         <div className={s.logo}>
           <img

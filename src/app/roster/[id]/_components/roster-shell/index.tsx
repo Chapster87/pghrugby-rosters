@@ -89,13 +89,13 @@ export default function RosterShell() {
       ...base,
       // Uploaded images are data URLs, which never round-trip (cloud contract):
       // fall back to the browser-local working set so the preview keeps what
-      // the Operator uploaded this week.
+      // the Operator uploaded this week. Drive-converted URLs do round-trip.
       sponsors: base.sponsors.some(Boolean) ? base.sponsors : loadSponsors(),
       clubLogo: base.clubLogo ?? loadClubLogo(),
     }
   }, [row])
 
-  const builder = useBuilderState(seed)
+  const builder = useBuilderState(seed, user?.id)
 
   const displayTitle = useMemo(() => {
     if (!row) return "Roster"
@@ -122,7 +122,9 @@ export default function RosterShell() {
         league: builder.draft.league || row.league,
         draft: builder.draft,
         sponsors: builder.sponsors,
+        sponsorsIsCustom: builder.sponsorsIsCustom,
         clubLogo: builder.clubLogo,
+        backgroundImage: builder.backgroundImage,
         activeFormat: builder.activeFormat,
         titleIsCustom: row.title_is_custom,
         title: row.title_is_custom ? row.title : undefined,

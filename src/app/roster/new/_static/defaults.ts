@@ -58,7 +58,9 @@ export function createDefaultBuilderState(): BuilderState {
     draft: createEmptyDraft(),
     playerLibrary: createEmptyPlayerLibrary(),
     sponsors: createEmptySponsors(),
+    sponsorsIsCustom: false,
     clubLogo: null,
+    backgroundImage: null,
     activeFormat: "portrait",
   }
 }

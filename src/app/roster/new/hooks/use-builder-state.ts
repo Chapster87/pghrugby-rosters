@@ -14,30 +14,39 @@ import type { GraphicFormatId } from "../_static/graphic-formats"
 import {
   createEmptyDraft,
   createDefaultBuilderState,
+  createEmptyPlayerLibrary,
   resolveClubLogoSrc,
 } from "../_static/defaults"
 import {
   clearDraftStorage,
+  loadBackgroundImage,
   loadClubLogo,
   loadDraft,
   loadPlayerLibrary,
   loadSponsors,
+  saveBackgroundImage,
   saveClubLogo,
   saveDraft,
   savePlayerLibrary,
   saveSponsors,
 } from "../_helpers/storage"
+import {
+  fetchPlayerLibrary,
+  removePlayerLibraryEntry as removeCloudPlayerLibraryEntry,
+  upsertPlayerLibraryEntries,
+} from "../../_helpers/player-library"
+import {
+  fetchLeagueDefaults,
+  upsertLeagueDefaults,
+} from "../../_helpers/league-defaults"
 
-/**
- * Editor state hydrated from a cloud Roster row instead of the local scratch
- * draft. Draft edits are not written to localStorage in this mode — the cloud
- * row is the source of truth and local autosave stays the create surface's
- * scratch.
- */
 export type BuilderSeed = {
   draft: Draft
   sponsors: Sponsors
+  /** False = sponsors follow league defaults; true = custom set. */
+  sponsorsIsCustom: boolean
   clubLogo: string | null
+  backgroundImage: string | null
   activeFormat: GraphicFormatId
 }
 
@@ -47,9 +56,13 @@ export type UseBuilderStateResult = {
   draft: Draft
   playerLibrary: PlayerLibrary
   sponsors: Sponsors
+  /** False = sponsors follow league defaults; true = custom set. */
+  sponsorsIsCustom: boolean
   clubLogo: string | null
   /** Club Logo src for UI: uploaded value or placeholder. */
   clubLogoSrc: string
+  /** Background Image URL, or null for the default. */
+  backgroundImage: string | null
   activeFormat: GraphicFormatId
   setActiveFormat: (format: GraphicFormatId) => void
   updateMatchDetails: (patch: Partial<MatchDetails>) => void
@@ -60,13 +73,31 @@ export type UseBuilderStateResult = {
   setSponsors: (sponsors: Sponsors) => void
   updateSponsorSlot: (index: number, dataUrl: string) => void
   clearSponsorSlot: (index: number) => void
+  /** Move a sponsor logo earlier/later among filled slots (customizes the set). */
+  reorderSponsors: (next: Sponsors) => void
   setClubLogo: (dataUrl: string | null) => void
+  setBackgroundImage: (url: string | null) => void
+  setSponsorsIsCustom: (custom: boolean) => void
+  /** Re-apply league defaults (also unfreezes the custom flag). */
+  useLeagueDefaults: () => void
+  /** Save the working sponsor set as the current League's defaults. */
+  saveLeagueDefaults: () => Promise<void>
   /** Clears Draft only; keeps Club Logo, Player Library, and Sponsors. */
   clearDraft: () => void
 }
 
+/**
+ * Editor state hydrated from a cloud Roster row instead of the local scratch
+ * draft. Draft edits are not written to localStorage in this mode — the cloud
+ * row is the source of truth and local autosave stays the create surface's
+ * scratch.
+ *
+ * `userId` (when signed in) enables the cloud-shared Player Library: the cloud
+ * copy loads and merges over the browser-local one, and add/remove sync up.
+ */
 export function useBuilderState(
-  seed?: BuilderSeed | null
+  seed?: BuilderSeed | null,
+  userId?: string
 ): UseBuilderStateResult {
   const [isReady, setIsReady] = useState(false)
   const [state, setState] = useState<BuilderState>(createDefaultBuilderState)
@@ -78,26 +109,107 @@ export function useBuilderState(
   useEffect(() => {
     if (seed) {
       // Cloud-backed editing: draft/sponsors/logo/format come from the row;
-      // the Player Library is shared and stays browser-local (never on the row).
+      // the Player Library is per-League and shared (never on the row).
       setState({
         draft: seed.draft,
-        playerLibrary: loadPlayerLibrary(),
+        playerLibrary: loadPlayerLibrary(seed.draft.league || "mens"),
         sponsors: seed.sponsors,
+        sponsorsIsCustom: seed.sponsorsIsCustom,
         clubLogo: seed.clubLogo,
+        backgroundImage: seed.backgroundImage,
         activeFormat: seed.activeFormat,
       })
     } else {
+      const draft = loadDraft()
       setState({
-        draft: loadDraft(),
-        playerLibrary: loadPlayerLibrary(),
+        draft,
+        playerLibrary: draft.league
+          ? loadPlayerLibrary(draft.league)
+          : createEmptyPlayerLibrary(),
         sponsors: loadSponsors(),
+        sponsorsIsCustom: false,
         clubLogo: loadClubLogo(),
+        backgroundImage: loadBackgroundImage(),
         activeFormat: "portrait",
       })
     }
     setIsReady(true)
   }, [seed])
   /* eslint-enable react-hooks/set-state-in-effect */
+
+  /*
+    Cloud-shared Player Library, split by League: the active League's entries
+    load from the cloud and merge over the browser-local set (cloud wins on
+    conflicts; local-only entries are pushed up so nothing is lost). Swapping
+    the Roster's League swaps the working library. Signed out — local only.
+  */
+  useEffect(() => {
+    const league = state.draft.league
+    if (!league) return
+    const local = loadPlayerLibrary(league)
+    savePlayerLibrary(league, local)
+    setState((prev) => ({ ...prev, playerLibrary: local }))
+    if (!userId) return
+    let active = true
+    fetchPlayerLibrary(league)
+      .then((cloud) => {
+        if (!active) return
+        setState((prev) => {
+          const playerLibrary: PlayerLibrary = {
+            ...prev.playerLibrary,
+            ...cloud,
+          }
+          savePlayerLibrary(league, playerLibrary)
+          const localOnly = Object.entries(prev.playerLibrary).filter(
+            ([name]) => !(name in cloud)
+          )
+          if (localOnly.length > 0) {
+            void upsertPlayerLibraryEntries(
+              league,
+              localOnly.map(([player_name, photo_url]) => ({
+                player_name,
+                photo_url,
+              }))
+            ).catch(() => {})
+          }
+          return { ...prev, playerLibrary }
+        })
+      })
+      .catch(() => {
+        // Cloud unavailable (e.g. signed out) — keep the browser-local library.
+      })
+    return () => {
+      active = false
+    }
+  }, [state.draft.league, userId])
+
+  /*
+    League-default sponsors: while a Roster is not custom, its working sponsor
+    set follows the league defaults (applied on league set/change). Manual
+    slot edits flip `sponsorsIsCustom`, freezing the set; "Use League
+    defaults" unfreezes it. Saved Rosters keep their snapshot (deserialize
+    treats a missing `sponsors_is_custom` as custom, so old rows never reset).
+  */
+  useEffect(() => {
+    const league = state.draft.league
+    if (!league || state.sponsorsIsCustom) return
+    let active = true
+    fetchLeagueDefaults(league)
+      .then((defaults) => {
+        if (!active) return
+        setState((prev) => {
+          if (prev.sponsorsIsCustom) return prev
+          saveSponsors(defaults)
+          return { ...prev, sponsors: defaults }
+        })
+      })
+      .catch(() => {
+        // Defaults unavailable — leave the current sponsor set as-is.
+      })
+    return () => {
+      active = false
+    }
+  }, [state.draft.league, state.sponsorsIsCustom])
 
   const setActiveFormat = useCallback((format: GraphicFormatId) => {
     setState((prev) => ({ ...prev, activeFormat: format }))
@@ -135,36 +247,56 @@ export function useBuilderState(
     [seed]
   )
 
-  const setPlayerLibrary = useCallback((library: PlayerLibrary) => {
-    savePlayerLibrary(library)
-    setState((prev) => ({ ...prev, playerLibrary: library }))
-  }, [])
+  const setPlayerLibrary = useCallback(
+    (library: PlayerLibrary) => {
+      const league = state.draft.league
+      if (!league) return
+      savePlayerLibrary(league, library)
+      setState((prev) => ({ ...prev, playerLibrary: library }))
+    },
+    [state.draft.league]
+  )
 
   const upsertPlayerLibraryEntry = useCallback(
     (name: string, photoUrl: string) => {
       const trimmed = name.trim()
       if (!trimmed || !photoUrl) return
+      const league = state.draft.league
+      if (!league) return // Library is per-League; the panel gates on a League.
       setState((prev) => {
         const playerLibrary = {
           ...prev.playerLibrary,
           [trimmed]: photoUrl,
         }
-        savePlayerLibrary(playerLibrary)
+        savePlayerLibrary(league, playerLibrary)
         return { ...prev, playerLibrary }
       })
+      if (userId) {
+        void upsertPlayerLibraryEntries(league, [
+          { player_name: trimmed, photo_url: photoUrl },
+        ]).catch(() => {})
+      }
     },
-    []
+    [state.draft.league, userId]
   )
 
-  const removePlayerLibraryEntry = useCallback((name: string) => {
-    setState((prev) => {
-      if (!(name in prev.playerLibrary)) return prev
-      const playerLibrary = { ...prev.playerLibrary }
-      delete playerLibrary[name]
-      savePlayerLibrary(playerLibrary)
-      return { ...prev, playerLibrary }
-    })
-  }, [])
+  const removePlayerLibraryEntry = useCallback(
+    (name: string) => {
+      const league = state.draft.league
+      if (!league) return
+      setState((prev) => {
+        if (!(name in prev.playerLibrary)) return prev
+        const playerLibrary = { ...prev.playerLibrary }
+        delete playerLibrary[name]
+        savePlayerLibrary(league, playerLibrary)
+        return { ...prev, playerLibrary }
+      })
+      if (userId) {
+        void removeCloudPlayerLibraryEntry(league, name).catch(() => {})
+      }
+    },
+    [state.draft.league, userId]
+  )
 
   const setSponsorsState = useCallback((sponsors: Sponsors) => {
     saveSponsors(sponsors)
@@ -177,7 +309,8 @@ export function useBuilderState(
       const sponsors = [...prev.sponsors]
       sponsors[index] = dataUrl
       saveSponsors(sponsors)
-      return { ...prev, sponsors }
+      // A manual slot edit customizes the set — stop following defaults.
+      return { ...prev, sponsors, sponsorsIsCustom: true }
     })
   }, [])
 
@@ -187,14 +320,51 @@ export function useBuilderState(
       const sponsors = [...prev.sponsors]
       sponsors[index] = ""
       saveSponsors(sponsors)
-      return { ...prev, sponsors }
+      return { ...prev, sponsors, sponsorsIsCustom: true }
     })
+  }, [])
+
+  const reorderSponsors = useCallback((next: Sponsors) => {
+    saveSponsors(next)
+    // Reordering is a customization — stop following league defaults.
+    setState((prev) => ({ ...prev, sponsors: next, sponsorsIsCustom: true }))
   }, [])
 
   const setClubLogo = useCallback((dataUrl: string | null) => {
     saveClubLogo(dataUrl)
     setState((prev) => ({ ...prev, clubLogo: dataUrl }))
   }, [])
+
+  const setBackgroundImage = useCallback((url: string | null) => {
+    saveBackgroundImage(url)
+    setState((prev) => ({ ...prev, backgroundImage: url }))
+  }, [])
+
+  const setSponsorsIsCustom = useCallback((custom: boolean) => {
+    setState((prev) => ({ ...prev, sponsorsIsCustom: custom }))
+  }, [])
+
+  const useLeagueDefaults = useCallback(() => {
+    const league = state.draft.league
+    if (!league) return
+    setState((prev) => ({ ...prev, sponsorsIsCustom: false }))
+    void fetchLeagueDefaults(league)
+      .then((defaults) => {
+        setState((prev) => {
+          saveSponsors(defaults)
+          return { ...prev, sponsors: defaults, sponsorsIsCustom: false }
+        })
+      })
+      .catch(() => {})
+  }, [state.draft.league])
+
+  const saveLeagueDefaults = useCallback(async (): Promise<void> => {
+    const league = state.draft.league
+    if (!league || !userId) {
+      throw new Error("Sign in and choose a League before saving defaults.")
+    }
+    await upsertLeagueDefaults(league, state.sponsors, userId)
+  }, [state.draft.league, state.sponsors, userId])
 
   const clearDraft = useCallback(() => {
     clearDraftStorage()
@@ -214,8 +384,10 @@ export function useBuilderState(
     draft: state.draft,
     playerLibrary: state.playerLibrary,
     sponsors: state.sponsors,
+    sponsorsIsCustom: state.sponsorsIsCustom,
     clubLogo: state.clubLogo,
     clubLogoSrc,
+    backgroundImage: state.backgroundImage,
     activeFormat: state.activeFormat,
     setActiveFormat,
     updateMatchDetails,
@@ -226,7 +398,12 @@ export function useBuilderState(
     setSponsors: setSponsorsState,
     updateSponsorSlot,
     clearSponsorSlot,
+    reorderSponsors,
     setClubLogo,
+    setBackgroundImage,
+    setSponsorsIsCustom,
+    useLeagueDefaults,
+    saveLeagueDefaults,
     clearDraft,
   }
 }

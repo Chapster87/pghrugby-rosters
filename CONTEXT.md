@@ -25,7 +25,7 @@ The role label on a Roster Slot (e.g. Hooker, Fly-half, Finisher). Defaults come
 _Avoid_: Role, job
 
 **Player Library**:
-The operator’s saved map of player display names to photo URLs, used to fill Roster Slot photos by name match. One shared library across Leagues for now.
+The operator’s saved map of player display names to photo URLs, used to fill Roster Slot photos by name match. Split by League (Men’s / Women’s); each Roster works with its League’s pool, cloud-backed in `player_library`.
 _Avoid_: Squad database, roster DB, contacts
 
 **Club Logo**:

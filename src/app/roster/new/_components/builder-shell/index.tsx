@@ -19,8 +19,8 @@ import s from "./styles.module.css"
  * `roster_drafts` row and moves the Operator to `/roster/<uuid>/`.
  */
 export default function BuilderShell() {
-  const builder = useBuilderState()
   const { user } = useAuth()
+  const builder = useBuilderState(undefined, user?.id)
   const router = useRouter()
 
   const [saving, setSaving] = useState(false)
@@ -46,7 +46,9 @@ export default function BuilderShell() {
           league,
           draft: builder.draft,
           sponsors: builder.sponsors,
+          sponsorsIsCustom: builder.sponsorsIsCustom,
           clubLogo: builder.clubLogo,
+          backgroundImage: builder.backgroundImage,
           activeFormat: builder.activeFormat,
         },
         user.id

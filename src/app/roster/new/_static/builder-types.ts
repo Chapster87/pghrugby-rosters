@@ -44,7 +44,11 @@ export type BuilderState = {
   draft: Draft
   playerLibrary: PlayerLibrary
   sponsors: Sponsors
-  /** Club Logo data URL, or null to use the placeholder. */
+  /** False = sponsors follow league defaults; true = custom set. */
+  sponsorsIsCustom: boolean
+  /** Club Logo data URL (browser-local) or Drive-converted URL, or null for the crest. */
   clubLogo: string | null
+  /** Background Image URL (Drive-converted), or null to keep the default. */
+  backgroundImage: string | null
   activeFormat: GraphicFormatId
 }

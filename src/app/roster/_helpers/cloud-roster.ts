@@ -17,7 +17,10 @@ import {
 export type DeserializedRoster = {
   draft: Draft
   sponsors: Sponsors
+  /** False = sponsors follow league defaults; true = custom set. */
+  sponsorsIsCustom: boolean
   clubLogo: string | null
+  backgroundImage: string | null
   activeFormat: GraphicFormatId
 }
 
@@ -29,7 +32,11 @@ export type RosterWrite = {
   league: LeagueId
   draft: Draft
   sponsors: Sponsors
+  /** False = sponsors follow league defaults; true = custom set. */
+  sponsorsIsCustom: boolean
   clubLogo: string | null
+  /** Background Image URL (Drive-converted), or null to keep the default. */
+  backgroundImage: string | null
   activeFormat: GraphicFormatId
   /** When true, `title` is fixed and auto-title stops. */
   titleIsCustom?: boolean
@@ -138,7 +145,10 @@ export function serializeRoster(write: RosterWrite): {
       branding: {
         club_logo: storableImage(write.clubLogo) ? write.clubLogo : null,
         sponsors: write.sponsors.map((src) => (storableImage(src) ? src : "")),
-        background_image: null,
+        sponsors_is_custom: Boolean(write.sponsorsIsCustom),
+        background_image: storableImage(write.backgroundImage)
+          ? write.backgroundImage
+          : null,
         story_background_image: null,
       },
       ui: {
@@ -192,7 +202,11 @@ export function deserializeRoster(row: CloudRosterRow): DeserializedRoster {
       slots,
     },
     sponsors,
+    // Rows saved before league-defaults shipped have no flag: treat them as
+    // custom so old Rosters keep their set and never reset to new defaults.
+    sponsorsIsCustom: state?.branding?.sponsors_is_custom !== false,
     clubLogo: state?.branding?.club_logo ?? null,
+    backgroundImage: state?.branding?.background_image ?? null,
     activeFormat: state?.ui?.active_format === "story" ? "story" : "portrait",
   }
 }
