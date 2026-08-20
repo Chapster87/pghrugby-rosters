@@ -1,4 +1,5 @@
 import s from "./styles.module.css"
+import AuthStatus from "./_components/auth-status"
 
 const CREST_SRC = "/images/pittsburgh-forge-crest.png"
 
@@ -26,6 +27,7 @@ export default function Header() {
             </p>
           </div>
         </div>
+        <AuthStatus />
       </div>
     </header>
   )
