@@ -1,5 +1,6 @@
 "use client"
 
+import { usePathname } from "next/navigation"
 import { useAuth } from "@/hooks/use-auth"
 import Avatar from "@/components/avatar"
 import Link from "@/components/link"
@@ -7,9 +8,11 @@ import s from "./style.module.css"
 
 /**
  * Signed-in Operator avatar in the upper right of the header with a sign-out
- * action; signed-out visitors get a Sign In link to the /sign-in/ route.
+ * action; signed-out visitors get a Sign In link to the /sign-in/ route that
+ * returns them to the current surface after auth.
  */
 export default function AuthStatus() {
+  const pathname = usePathname()
   const { user, loading, signOut } = useAuth()
 
   if (loading) {
@@ -18,7 +21,12 @@ export default function AuthStatus() {
 
   if (!user) {
     return (
-      <Link href="/sign-in/" buttonStyle variant="secondary" size="small">
+      <Link
+        href={`/sign-in/?returnTo=${encodeURIComponent(pathname)}`}
+        buttonStyle
+        variant="secondary"
+        size="small"
+      >
         Sign In
       </Link>
     )
