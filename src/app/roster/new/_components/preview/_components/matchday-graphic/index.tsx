@@ -8,7 +8,6 @@ import type {
 import type { GraphicFormat } from "../../../../_static/graphic-formats"
 import {
   getRosterSlotsByGroup,
-  type RosterSlotDefinition,
   type RosterSlotGroup,
 } from "../../../../_static/roster-slots"
 import { corsModeForImageSrc } from "../../../../_helpers/export-png"
@@ -30,11 +29,17 @@ export type MatchdayGraphicProps = {
 }
 
 type SlotView = {
-  def: RosterSlotDefinition
+  /** Stable key from the editor Roster Slot (may skip on finishers). */
+  slotNumber: number
+  /** Jersey badge shown on the graphic (sequential for finishers). */
+  displayNumber: number
   name: string
   position: string
   photoSrc: string
 }
+
+/** First jersey number on the bench graphic (after Starting Lineup 1–15). */
+const FINISHER_DISPLAY_START = 16
 
 function buildGroupSlots(
   group: RosterSlotGroup,
@@ -52,12 +57,17 @@ function buildGroupSlots(
     })
   }
 
-  return defs.map((def) => {
+  return defs.map((def, index) => {
     const value = draft.slots[def.number]
     const name = value?.name?.trim() ?? ""
     const position = (value?.position ?? def.position).trim()
+    // Starters keep fixed 1–15. Finishers renumber by filled order so a skipped
+    // editor slot does not leave a gap on the graphic (16, 17, 18…).
+    const displayNumber =
+      group === "finishers" ? FINISHER_DISPLAY_START + index : def.number
     return {
-      def,
+      slotNumber: def.number,
+      displayNumber,
       name,
       position,
       photoSrc: resolveSlotPhotoSrc(name, playerLibrary, clubLogoSrc),
@@ -99,7 +109,7 @@ function SlotCell({
           }}
         />
         <span className={s.jersey} aria-hidden="true">
-          {slot.def.number}
+          {slot.displayNumber}
         </span>
       </div>
       <div className={s.name}>{slot.name || "—"}</div>
@@ -199,7 +209,7 @@ export default function MatchdayGraphic({
         <div className={`${s.grid} ${s.gridStarters}`}>
           {starters.map((slot) => (
             <SlotCell
-              key={slot.def.number}
+              key={slot.slotNumber}
               slot={slot}
               clubLogoSrc={clubLogoSrc}
             />
@@ -215,7 +225,7 @@ export default function MatchdayGraphic({
           <div className={`${s.grid} ${s.gridFinishers}`}>
             {finishers.map((slot) => (
               <SlotCell
-                key={slot.def.number}
+                key={slot.slotNumber}
                 slot={slot}
                 clubLogoSrc={clubLogoSrc}
               />
