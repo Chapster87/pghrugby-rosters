@@ -1,22 +1,30 @@
 "use client"
 
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+
 import Button from "@/components/button"
+import Link from "@/components/link"
+import { useAuth } from "@/hooks/use-auth"
 
 import { useBuilderState } from "../../hooks/use-builder-state"
-import MatchDetailsPanel from "../match-details"
-import PlayerLibraryPanel from "../player-library"
-import PreviewPanel from "../preview"
-import RosterSlotsPanel from "../roster-slots"
-import SponsorsPanel from "../sponsors"
+import { insertRoster } from "../../../_helpers/cloud-roster"
+import RosterEditor from "../../../_components/roster-editor"
 
 import s from "./styles.module.css"
 
 /**
- * Composed Matchday Squad builder shell.
- * Controls + live Portrait/Story preview + PNG Export.
+ * Composed Matchday Squad builder shell for `/roster/new/` — the create
+ * surface. Local autosave scratch until the first cloud Save, which inserts a
+ * `roster_drafts` row and moves the Operator to `/roster/<uuid>/`.
  */
 export default function BuilderShell() {
   const builder = useBuilderState()
+  const { user } = useAuth()
+  const router = useRouter()
+
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   function handleClearDraft() {
     const confirmed = window.confirm(
@@ -26,52 +34,66 @@ export default function BuilderShell() {
     builder.clearDraft()
   }
 
+  async function handleSave() {
+    // League is required — chosen in Match Details; Save stays disabled until set.
+    const league = builder.draft.league
+    if (!league || !user || saving) return
+    setSaving(true)
+    setSaveError(null)
+    try {
+      const id = await insertRoster(
+        {
+          league,
+          draft: builder.draft,
+          sponsors: builder.sponsors,
+          clubLogo: builder.clubLogo,
+          activeFormat: builder.activeFormat,
+        },
+        user.id
+      )
+      // Scratch is now cloud; leave the create surface on the saved Roster.
+      builder.clearDraft()
+      router.replace(`/roster/${id}/`)
+    } catch (error) {
+      setSaveError(
+        error instanceof Error ? error.message : "Could not save this Roster."
+      )
+      setSaving(false)
+    }
+  }
+
   return (
-    <div className={s.shell} data-ready={builder.isReady}>
-      <div className={s.controls}>
-        <MatchDetailsPanel
-          value={builder.draft}
-          onChange={builder.updateMatchDetails}
-          clubLogoSrc={builder.clubLogoSrc}
-          onClubLogoChange={builder.setClubLogo}
-        />
+    <RosterEditor
+      builder={builder}
+      actions={
+        <>
+          {user ? (
+            <Button
+              type="button"
+              variant="primary"
+              onClick={handleSave}
+              disabled={!builder.draft.league || saving}
+              isLoading={saving}
+            >
+              {saving ? "Saving…" : "Save"}
+            </Button>
+          ) : (
+            <Link href="/sign-in/?returnTo=/roster/new/" buttonStyle>
+              Sign in to save
+            </Link>
+          )}
 
-        <PlayerLibraryPanel
-          library={builder.playerLibrary}
-          clubLogoSrc={builder.clubLogoSrc}
-          onUpsert={builder.upsertPlayerLibraryEntry}
-          onRemove={builder.removePlayerLibraryEntry}
-        />
-
-        <RosterSlotsPanel
-          draft={builder.draft}
-          playerLibrary={builder.playerLibrary}
-          onSlotChange={builder.updateRosterSlot}
-        />
-
-        <SponsorsPanel
-          sponsors={builder.sponsors}
-          onUpdateSlot={builder.updateSponsorSlot}
-          onClearSlot={builder.clearSponsorSlot}
-        />
-
-        <div className={s.actions}>
           <Button variant="secondary" type="button" onClick={handleClearDraft}>
             New Week (clear roster)
           </Button>
-        </div>
-      </div>
 
-      <div className={s.preview}>
-        <PreviewPanel
-          draft={builder.draft}
-          playerLibrary={builder.playerLibrary}
-          sponsors={builder.sponsors}
-          clubLogoSrc={builder.clubLogoSrc}
-          activeFormat={builder.activeFormat}
-          onFormatChange={builder.setActiveFormat}
-        />
-      </div>
-    </div>
+          {saveError ? (
+            <p className={s.saveError} role="alert">
+              {saveError}
+            </p>
+          ) : null}
+        </>
+      }
+    />
   )
 }

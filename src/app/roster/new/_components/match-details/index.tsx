@@ -2,6 +2,7 @@
 
 import type { ChangeEvent } from "react"
 
+import type { LeagueId } from "../../../_static/cloud-roster"
 import type { MatchDetails, Venue } from "../../_static/builder-types"
 import { readImageFileAsDataUrl } from "../../_helpers/read-image-file"
 
@@ -42,6 +43,13 @@ export default function MatchDetailsPanel({
     }
   }
 
+  function handleLeagueChange(event: ChangeEvent<HTMLSelectElement>) {
+    const next = event.target.value
+    if (next === "mens" || next === "womens") {
+      onChange({ league: next as LeagueId })
+    }
+  }
+
   return (
     <section className={s.section} aria-labelledby="match-details-heading">
       <div className={s.block}>
@@ -72,6 +80,31 @@ export default function MatchDetailsPanel({
         <h2 id="match-details-heading" className={s.heading}>
           Match Details
         </h2>
+
+        <div className={s.row2}>
+          <label className={s.field}>
+            <span className={s.label}>League (required)</span>
+            <select
+              className={s.input}
+              value={value.league}
+              onChange={handleLeagueChange}
+            >
+              <option value="">Select…</option>
+              <option value="mens">Men&apos;s</option>
+              <option value="womens">Women&apos;s</option>
+            </select>
+          </label>
+          <label className={s.field}>
+            <span className={s.label}>Division (optional)</span>
+            <input
+              type="text"
+              className={s.input}
+              value={value.division}
+              placeholder="e.g. Midwest D1"
+              onChange={(event) => onChange({ division: event.target.value })}
+            />
+          </label>
+        </div>
 
         <label className={s.field}>
           <span className={s.label}>Opponent</span>
@@ -105,31 +138,17 @@ export default function MatchDetailsPanel({
           </label>
         </div>
 
-        <div className={s.row2}>
-          <label className={s.field}>
-            <span className={s.label}>Home / Away</span>
-            <select
-              className={s.input}
-              value={value.venue}
-              onChange={handleVenueChange}
-            >
-              <option value="Home">Home</option>
-              <option value="Away">Away</option>
-            </select>
-          </label>
-          <label className={s.field}>
-            <span className={s.label}>Competition (optional)</span>
-            <input
-              type="text"
-              className={s.input}
-              value={value.competition}
-              placeholder="e.g. Midwest D1"
-              onChange={(event) =>
-                onChange({ competition: event.target.value })
-              }
-            />
-          </label>
-        </div>
+        <label className={s.field}>
+          <span className={s.label}>Home / Away</span>
+          <select
+            className={s.input}
+            value={value.venue}
+            onChange={handleVenueChange}
+          >
+            <option value="Home">Home</option>
+            <option value="Away">Away</option>
+          </select>
+        </label>
 
         <label className={s.field}>
           <span className={s.label}>Address (optional)</span>

@@ -28,6 +28,19 @@ import {
   saveSponsors,
 } from "../_helpers/storage"
 
+/**
+ * Editor state hydrated from a cloud Roster row instead of the local scratch
+ * draft. Draft edits are not written to localStorage in this mode — the cloud
+ * row is the source of truth and local autosave stays the create surface's
+ * scratch.
+ */
+export type BuilderSeed = {
+  draft: Draft
+  sponsors: Sponsors
+  clubLogo: string | null
+  activeFormat: GraphicFormatId
+}
+
 export type UseBuilderStateResult = {
   /** False until client storage has been read (avoids SSR/local mismatch). */
   isReady: boolean
@@ -52,32 +65,54 @@ export type UseBuilderStateResult = {
   clearDraft: () => void
 }
 
-export function useBuilderState(): UseBuilderStateResult {
+export function useBuilderState(
+  seed?: BuilderSeed | null
+): UseBuilderStateResult {
   const [isReady, setIsReady] = useState(false)
   const [state, setState] = useState<BuilderState>(createDefaultBuilderState)
 
+  /* eslint-disable react-hooks/set-state-in-effect -- SSR-safe hydration: this
+     effect exists to pull external state (localStorage, or a cloud row seed)
+     into React after mount so the statically-exported HTML never mismatches;
+     the advisory targets derived state, not external-system hydration. */
   useEffect(() => {
-    setState({
-      draft: loadDraft(),
-      playerLibrary: loadPlayerLibrary(),
-      sponsors: loadSponsors(),
-      clubLogo: loadClubLogo(),
-      activeFormat: "portrait",
-    })
+    if (seed) {
+      // Cloud-backed editing: draft/sponsors/logo/format come from the row;
+      // the Player Library is shared and stays browser-local (never on the row).
+      setState({
+        draft: seed.draft,
+        playerLibrary: loadPlayerLibrary(),
+        sponsors: seed.sponsors,
+        clubLogo: seed.clubLogo,
+        activeFormat: seed.activeFormat,
+      })
+    } else {
+      setState({
+        draft: loadDraft(),
+        playerLibrary: loadPlayerLibrary(),
+        sponsors: loadSponsors(),
+        clubLogo: loadClubLogo(),
+        activeFormat: "portrait",
+      })
+    }
     setIsReady(true)
-  }, [])
+  }, [seed])
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const setActiveFormat = useCallback((format: GraphicFormatId) => {
     setState((prev) => ({ ...prev, activeFormat: format }))
   }, [])
 
-  const updateMatchDetails = useCallback((patch: Partial<MatchDetails>) => {
-    setState((prev) => {
-      const draft = { ...prev.draft, ...patch }
-      saveDraft(draft)
-      return { ...prev, draft }
-    })
-  }, [])
+  const updateMatchDetails = useCallback(
+    (patch: Partial<MatchDetails>) => {
+      setState((prev) => {
+        const draft = { ...prev.draft, ...patch }
+        if (!seed) saveDraft(draft)
+        return { ...prev, draft }
+      })
+    },
+    [seed]
+  )
 
   const updateRosterSlot = useCallback(
     (number: number, patch: Partial<RosterSlotValue>) => {
@@ -93,11 +128,11 @@ export function useBuilderState(): UseBuilderStateResult {
             [number]: { ...current, ...patch },
           },
         }
-        saveDraft(draft)
+        if (!seed) saveDraft(draft)
         return { ...prev, draft }
       })
     },
-    []
+    [seed]
   )
 
   const setPlayerLibrary = useCallback((library: PlayerLibrary) => {

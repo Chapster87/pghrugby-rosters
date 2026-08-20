@@ -1,0 +1,39 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+
+  @media (--viewport-md-up) {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 20px;
+  }
+}
+
+/* Single white controls panel (HTML .panel.controls) */
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  flex: 1 1 460px;
+  min-width: 0;
+  max-width: 520px;
+  padding: 18px 20px;
+  background-color: var(--color-white);
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.preview {
+  flex: 1 1 460px;
+  min-width: 0;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding-top: 18px;
+}

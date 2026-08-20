@@ -53,8 +53,8 @@ Kind of fixture: League (championship pathway), Friendly, Playoff, or Tour. Defa
 _Avoid_: Game type, fixture type
 
 **Match Details**:
-League, opponent, date, kickoff, venue (home/away), Match Type, optional Division and address shown on the graphic header.
-_Avoid_: Game info, fixture block, Competition (retired field name)
+League, opponent, date, kickoff, venue (home/away), Match Type, optional Division, and address shown on the graphic header. Division is an optional free-text field that persists (column + `state.match`), distinguishing same-day games.
+_Avoid_: Game info, fixture block, Competition (retired label for Division)
 
 **Background Image**:
 Full-bleed image behind the Matchday Squad graphic. One shared default for all Graphic Formats; Story may optionally override.

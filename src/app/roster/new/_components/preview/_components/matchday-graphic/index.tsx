@@ -85,7 +85,7 @@ export default function MatchdayGraphic({
   const opponent = draft.opponent.trim() || "TBD Opponent"
   const dateStr = formatMatchDate(draft.matchDate)
   const kickoff = draft.kickoff.trim()
-  const competition = draft.competition.trim()
+  const division = draft.division.trim()
   const address = draft.address.trim()
   const filledSponsors = sponsors.filter(Boolean)
 
@@ -122,7 +122,7 @@ export default function MatchdayGraphic({
           </div>
           <div>
             {draft.venue}
-            {competition ? ` · ${competition}` : ""}
+            {division ? ` · ${division}` : ""}
           </div>
           {address ? <div className={s.address}>{address}</div> : null}
         </div>

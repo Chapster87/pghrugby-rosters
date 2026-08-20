@@ -1,14 +1,18 @@
 import type { GraphicFormatId } from "./graphic-formats"
+import type { LeagueId } from "../../_static/cloud-roster"
 
 export type Venue = "Home" | "Away"
 
 /** Match Details shown on the graphic header. */
 export type MatchDetails = {
+  /** Men's | Women's — required before any cloud Save ("" = not chosen). */
+  league: LeagueId | ""
   opponent: string
   matchDate: string
   kickoff: string
   venue: Venue
-  competition: string
+  /** Optional free-text level/flight within a League (distinguishes same-day games). */
+  division: string
   address: string
 }
 

@@ -12,13 +12,13 @@ import {
   createEmptyPlayerLibrary,
   createEmptySponsors,
 } from "../_static/defaults"
+import type { LeagueId } from "../../_static/cloud-roster"
 import { ROSTER_SLOT_DEFINITIONS } from "../_static/roster-slots"
 import { STORAGE_KEYS } from "../_static/storage-keys"
 
 function canUseStorage(): boolean {
   return (
-    typeof window !== "undefined" &&
-    typeof window.localStorage !== "undefined"
+    typeof window !== "undefined" && typeof window.localStorage !== "undefined"
   )
 }
 
@@ -51,6 +51,10 @@ function removeRaw(key: string): void {
 
 function isVenue(value: unknown): value is Venue {
   return value === "Home" || value === "Away"
+}
+
+function isLeague(value: unknown): value is LeagueId {
+  return value === "mens" || value === "womens"
 }
 
 function normalizeSlot(
@@ -91,12 +95,18 @@ function normalizeDraft(raw: unknown): Draft {
   }
 
   return {
+    league: isLeague(record.league) ? record.league : "",
     opponent: typeof record.opponent === "string" ? record.opponent : "",
     matchDate: typeof record.matchDate === "string" ? record.matchDate : "",
     kickoff: typeof record.kickoff === "string" ? record.kickoff : "",
     venue: isVenue(record.venue) ? record.venue : "Home",
-    competition:
-      typeof record.competition === "string" ? record.competition : "",
+    // Legacy drafts stored the level under `competition`; Division is the label now.
+    division:
+      typeof record.division === "string"
+        ? record.division
+        : typeof record.competition === "string"
+          ? record.competition
+          : "",
     address: typeof record.address === "string" ? record.address : "",
     slots,
   }
