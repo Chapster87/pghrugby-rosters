@@ -1,11 +1,14 @@
-import BuilderShell from "./_components/builder-shell"
+import type { Metadata } from "next"
+import RostersLanding from "./_components/rosters-landing"
 
-import s from "./styles.module.css"
+export const metadata: Metadata = {
+  title: "Rosters",
+}
 
+/**
+ * `/` — auth-gated Rosters landing. Signed-in Operators get the dense
+ * chronological table (Variant C); signed-out visitors get a sign-in gate.
+ */
 export default function Home() {
-  return (
-    <div className={s.page}>
-      <BuilderShell />
-    </div>
-  )
+  return <RostersLanding />
 }
