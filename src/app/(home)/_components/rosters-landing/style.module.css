@@ -1,11 +1,9 @@
 .page {
+  composes: global-grid-container from global;
   display: flex;
   flex-direction: column;
-  width: 100%;
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 20px;
   gap: 16px;
+  padding-top: 20px;
   padding-bottom: 48px;
 }
 
@@ -137,7 +135,11 @@
   color: var(--color-grey-800);
 
   &[data-league="mens"] {
-    background: color-mix(in srgb, var(--color-primary) 28%, var(--color-white));
+    background: color-mix(
+      in srgb,
+      var(--color-primary) 28%,
+      var(--color-white)
+    );
     color: var(--color-black);
   }
 
