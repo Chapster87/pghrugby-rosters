@@ -14,6 +14,8 @@ export type MatchDetails = {
   /** Optional free-text level/flight within a League (distinguishes same-day games). */
   division: string
   address: string
+  /** Second address line (rendered below Address on the graphic). */
+  address2: string
 }
 
 /** Operator-entered values for one Roster Slot. */
@@ -48,7 +50,9 @@ export type BuilderState = {
   sponsorsIsCustom: boolean
   /** Club Logo data URL (browser-local) or Drive-converted URL, or null for the crest. */
   clubLogo: string | null
-  /** Background Image URL (Drive-converted), or null to keep the default. */
+  /** Background Image URL (Drive-converted), or null for the default. */
   backgroundImage: string | null
+  /** False = background follows the shared app default; true = custom. */
+  backgroundIsCustom: boolean
   activeFormat: GraphicFormatId
 }

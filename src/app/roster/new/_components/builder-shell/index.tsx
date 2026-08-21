@@ -49,6 +49,7 @@ export default function BuilderShell() {
           sponsorsIsCustom: builder.sponsorsIsCustom,
           clubLogo: builder.clubLogo,
           backgroundImage: builder.backgroundImage,
+          backgroundIsCustom: builder.backgroundIsCustom,
           activeFormat: builder.activeFormat,
         },
         user.id

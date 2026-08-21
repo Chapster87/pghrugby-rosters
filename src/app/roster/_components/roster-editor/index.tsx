@@ -66,7 +66,10 @@ export default function RosterEditor({ builder, actions }: RosterEditorProps) {
 
         <BackgroundImagePanel
           value={builder.backgroundImage}
+          isCustom={builder.backgroundIsCustom}
           onChange={builder.setBackgroundImage}
+          onUseDefault={builder.useDefaultBackground}
+          onSaveDefault={builder.saveDefaultBackground}
         />
 
         {actions ? <div className={s.actions}>{actions}</div> : null}

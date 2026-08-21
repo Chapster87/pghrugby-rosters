@@ -24,6 +24,7 @@ export function createEmptyMatchDetails(): MatchDetails {
     venue: "Home",
     division: "",
     address: "",
+    address2: "",
   }
 }
 
@@ -61,6 +62,7 @@ export function createDefaultBuilderState(): BuilderState {
     sponsorsIsCustom: false,
     clubLogo: null,
     backgroundImage: null,
+    backgroundIsCustom: false,
     activeFormat: "portrait",
   }
 }

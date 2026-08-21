@@ -21,6 +21,8 @@ export type DeserializedRoster = {
   sponsorsIsCustom: boolean
   clubLogo: string | null
   backgroundImage: string | null
+  /** False = background follows the shared app default; true = custom. */
+  backgroundIsCustom: boolean
   activeFormat: GraphicFormatId
 }
 
@@ -37,6 +39,8 @@ export type RosterWrite = {
   clubLogo: string | null
   /** Background Image URL (Drive-converted), or null to keep the default. */
   backgroundImage: string | null
+  /** False = background follows the shared app default; true = custom. */
+  backgroundIsCustom: boolean
   activeFormat: GraphicFormatId
   /** When true, `title` is fixed and auto-title stops. */
   titleIsCustom?: boolean
@@ -140,6 +144,7 @@ export function serializeRoster(write: RosterWrite): {
         kickoff: write.draft.kickoff,
         venue: write.draft.venue,
         address: write.draft.address,
+        address2: write.draft.address2,
       },
       roster,
       branding: {
@@ -149,6 +154,7 @@ export function serializeRoster(write: RosterWrite): {
         background_image: storableImage(write.backgroundImage)
           ? write.backgroundImage
           : null,
+        background_is_custom: Boolean(write.backgroundIsCustom),
         story_background_image: null,
       },
       ui: {
@@ -199,6 +205,7 @@ export function deserializeRoster(row: CloudRosterRow): DeserializedRoster {
       venue: isVenue(state?.match?.venue) ? state.match.venue : "Home",
       division: state?.match?.division ?? "",
       address: state?.match?.address ?? "",
+      address2: state?.match?.address2 ?? "",
       slots,
     },
     sponsors,
@@ -207,6 +214,9 @@ export function deserializeRoster(row: CloudRosterRow): DeserializedRoster {
     sponsorsIsCustom: state?.branding?.sponsors_is_custom !== false,
     clubLogo: state?.branding?.club_logo ?? null,
     backgroundImage: state?.branding?.background_image ?? null,
+    // Rows saved before the shared default shipped have no flag: treat them as
+    // custom so saved backgrounds never reset when the default changes.
+    backgroundIsCustom: state?.branding?.background_is_custom !== false,
     activeFormat: state?.ui?.active_format === "story" ? "story" : "portrait",
   }
 }

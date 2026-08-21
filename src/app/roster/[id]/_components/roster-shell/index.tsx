@@ -125,6 +125,7 @@ export default function RosterShell() {
         sponsorsIsCustom: builder.sponsorsIsCustom,
         clubLogo: builder.clubLogo,
         backgroundImage: builder.backgroundImage,
+        backgroundIsCustom: builder.backgroundIsCustom,
         activeFormat: builder.activeFormat,
         titleIsCustom: row.title_is_custom,
         title: row.title_is_custom ? row.title : undefined,

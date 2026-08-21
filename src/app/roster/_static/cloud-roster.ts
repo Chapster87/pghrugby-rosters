@@ -29,6 +29,8 @@ export type CloudRosterState = {
     kickoff: string
     venue: Venue
     address: string
+    /** Second address line (rendered below Address on the graphic). */
+    address2: string
   }
   /** Jersey number (string key) → player. 1–15 always present; 16+ only when filled. */
   roster: Record<string, { player_name: string; label: string }>
@@ -39,6 +41,8 @@ export type CloudRosterState = {
     /** False = working sponsor set follows league defaults; true = custom. */
     sponsors_is_custom: boolean
     background_image: string | null
+    /** False = background follows the shared app default; true = custom. */
+    background_is_custom: boolean
     story_background_image: string | null
   }
   ui: {

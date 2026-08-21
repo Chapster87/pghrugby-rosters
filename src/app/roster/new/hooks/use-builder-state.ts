@@ -39,6 +39,10 @@ import {
   fetchLeagueDefaults,
   upsertLeagueDefaults,
 } from "../../_helpers/league-defaults"
+import {
+  fetchAppDefaultBackground,
+  upsertAppDefaultBackground,
+} from "../../_helpers/app-defaults"
 
 export type BuilderSeed = {
   draft: Draft
@@ -47,6 +51,8 @@ export type BuilderSeed = {
   sponsorsIsCustom: boolean
   clubLogo: string | null
   backgroundImage: string | null
+  /** False = background follows the shared app default; true = custom. */
+  backgroundIsCustom: boolean
   activeFormat: GraphicFormatId
 }
 
@@ -63,6 +69,8 @@ export type UseBuilderStateResult = {
   clubLogoSrc: string
   /** Background Image URL, or null for the default. */
   backgroundImage: string | null
+  /** False = background follows the shared app default; true = custom. */
+  backgroundIsCustom: boolean
   activeFormat: GraphicFormatId
   setActiveFormat: (format: GraphicFormatId) => void
   updateMatchDetails: (patch: Partial<MatchDetails>) => void
@@ -82,6 +90,11 @@ export type UseBuilderStateResult = {
   useLeagueDefaults: () => void
   /** Save the working sponsor set as the current League's defaults. */
   saveLeagueDefaults: () => Promise<void>
+  setBackgroundIsCustom: (custom: boolean) => void
+  /** Stop customizing and re-apply the shared background default. */
+  useDefaultBackground: () => void
+  /** Save the working background as the app-wide default. */
+  saveDefaultBackground: () => Promise<void>
   /** Clears Draft only; keeps Club Logo, Player Library, and Sponsors. */
   clearDraft: () => void
 }
@@ -117,6 +130,7 @@ export function useBuilderState(
         sponsorsIsCustom: seed.sponsorsIsCustom,
         clubLogo: seed.clubLogo,
         backgroundImage: seed.backgroundImage,
+        backgroundIsCustom: seed.backgroundIsCustom,
         activeFormat: seed.activeFormat,
       })
     } else {
@@ -130,6 +144,7 @@ export function useBuilderState(
         sponsorsIsCustom: false,
         clubLogo: loadClubLogo(),
         backgroundImage: loadBackgroundImage(),
+        backgroundIsCustom: false,
         activeFormat: "portrait",
       })
     }
@@ -210,6 +225,33 @@ export function useBuilderState(
       active = false
     }
   }, [state.draft.league, state.sponsorsIsCustom])
+
+  /*
+    Shared background default: while a Roster is not custom, its background
+    follows the app-wide default (applied on load / when custom clears). New
+    Rosters start not-custom, so the default shows immediately. Saved rows
+    keep their snapshot (deserialize treats a missing `background_is_custom`
+    as custom, so old backgrounds never reset).
+  */
+  useEffect(() => {
+    if (state.backgroundIsCustom) return
+    let active = true
+    fetchAppDefaultBackground()
+      .then((url) => {
+        if (!active) return
+        setState((prev) => {
+          if (prev.backgroundIsCustom) return prev
+          saveBackgroundImage(url)
+          return { ...prev, backgroundImage: url }
+        })
+      })
+      .catch(() => {
+        // Default unavailable — leave the current background as-is.
+      })
+    return () => {
+      active = false
+    }
+  }, [state.backgroundIsCustom])
 
   const setActiveFormat = useCallback((format: GraphicFormatId) => {
     setState((prev) => ({ ...prev, activeFormat: format }))
@@ -337,7 +379,12 @@ export function useBuilderState(
 
   const setBackgroundImage = useCallback((url: string | null) => {
     saveBackgroundImage(url)
-    setState((prev) => ({ ...prev, backgroundImage: url }))
+    // Setting a background is a customization — stop following the default.
+    setState((prev) => ({
+      ...prev,
+      backgroundImage: url,
+      backgroundIsCustom: true,
+    }))
   }, [])
 
   const setSponsorsIsCustom = useCallback((custom: boolean) => {
@@ -366,6 +413,29 @@ export function useBuilderState(
     await upsertLeagueDefaults(league, state.sponsors, userId)
   }, [state.draft.league, state.sponsors, userId])
 
+  const setBackgroundIsCustom = useCallback((custom: boolean) => {
+    setState((prev) => ({ ...prev, backgroundIsCustom: custom }))
+  }, [])
+
+  const useDefaultBackground = useCallback(() => {
+    setState((prev) => ({ ...prev, backgroundIsCustom: false }))
+    void fetchAppDefaultBackground()
+      .then((url) => {
+        setState((prev) => {
+          saveBackgroundImage(url)
+          return { ...prev, backgroundImage: url, backgroundIsCustom: false }
+        })
+      })
+      .catch(() => {})
+  }, [])
+
+  const saveDefaultBackground = useCallback(async (): Promise<void> => {
+    if (!userId) {
+      throw new Error("Sign in before saving a default background.")
+    }
+    await upsertAppDefaultBackground(state.backgroundImage, userId)
+  }, [state.backgroundImage, userId])
+
   const clearDraft = useCallback(() => {
     clearDraftStorage()
     setState((prev) => ({
@@ -388,6 +458,7 @@ export function useBuilderState(
     clubLogo: state.clubLogo,
     clubLogoSrc,
     backgroundImage: state.backgroundImage,
+    backgroundIsCustom: state.backgroundIsCustom,
     activeFormat: state.activeFormat,
     setActiveFormat,
     updateMatchDetails,
@@ -404,6 +475,9 @@ export function useBuilderState(
     setSponsorsIsCustom,
     useLeagueDefaults,
     saveLeagueDefaults,
+    setBackgroundIsCustom,
+    useDefaultBackground,
+    saveDefaultBackground,
     clearDraft,
   }
 }

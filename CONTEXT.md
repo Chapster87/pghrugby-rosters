@@ -57,7 +57,7 @@ League, opponent, date, kickoff, venue (home/away), Match Type, optional Divisio
 _Avoid_: Game info, fixture block, Competition (retired label for Division)
 
 **Background Image**:
-Full-bleed image behind the Matchday Squad graphic. One shared default for all Graphic Formats; Story may optionally override.
+Full-bleed image behind the Matchday Squad graphic. One shared cloud default for all Graphic Formats, applied to new Rosters until redefined; saved Rosters keep their set. Story may optionally override.
 _Avoid_: Wallpaper, canvas background
 
 **Graphic Format**:

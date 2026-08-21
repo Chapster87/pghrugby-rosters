@@ -111,13 +111,24 @@ export default function MatchDetailsPanel({
         </label>
 
         <label className={s.field}>
-          <span className={s.label}>Address (optional)</span>
+          <span className={s.label}>Address</span>
           <input
             type="text"
             className={s.input}
             value={value.address}
             placeholder="e.g. 123 Rugby Way, Pittsburgh, PA 15220"
             onChange={(event) => onChange({ address: event.target.value })}
+          />
+        </label>
+
+        <label className={s.field}>
+          <span className={s.label}>Address 2</span>
+          <input
+            type="text"
+            className={s.input}
+            value={value.address2}
+            placeholder="e.g. Gate 4, field 2"
+            onChange={(event) => onChange({ address2: event.target.value })}
           />
         </label>
       </div>
