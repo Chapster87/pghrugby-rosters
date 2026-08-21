@@ -141,6 +141,7 @@ export default function MatchdayGraphic({
   const matchupMarker = draft.venue === "Away" ? "@" : "vs"
   const dateStr = formatMatchDate(draft.matchDate)
   const kickoff = draft.kickoff.trim()
+  const timezone = draft.timezone.trim()
   // Stored id is mens|womens; graphic shows the display label (Men's / Women's).
   const leagueLabel = draft.league ? LEAGUE_LABEL[draft.league] : ""
   const division = draft.division.trim()
@@ -182,13 +183,15 @@ export default function MatchdayGraphic({
         />
       ) : null}
       <header className={s.header}>
-        <div className={s.logo}>
-          <img
-            src={clubLogoSrc}
-            alt=""
-            draggable={false}
-            crossOrigin={corsModeForImageSrc(clubLogoSrc)}
-          />
+        <div className={s.logoWrap}>
+          <div className={s.logo}>
+            <img
+              src={clubLogoSrc}
+              alt=""
+              draggable={false}
+              crossOrigin={corsModeForImageSrc(clubLogoSrc)}
+            />
+          </div>
         </div>
         <div className={s.titles}>
           <p className={s.clubName}>PITTSBURGH FORGE</p>
@@ -198,15 +201,27 @@ export default function MatchdayGraphic({
               {matchupMarker} {opponent}
             </span>
           </p>
-        </div>
-        <div className={s.match}>
-          <div>
-            {dateStr}
-            {kickoff ? ` · ${kickoff}` : ""}
+          <div className={s.dateVenue}>
+            <p className={s.venueKickoff}>
+              {draft.venue}
+              {kickoff
+                ? ` · ${kickoff} Kickoff${timezone ? ` ${timezone}` : ""}`
+                : ""}
+            </p>
+            <p className={s.date}>{dateStr}</p>
           </div>
-          <div>{draft.venue}</div>
-          {address ? <div className={s.address}>{address}</div> : null}
-          {address2 ? <div className={s.address}>{address2}</div> : null}
+        </div>
+        <div className={s.addresses}>
+          <div className={s.fieldAddress}>
+            <div className={s.addressLabel}>Field Address:</div>
+            {address ? <div className={s.address}>{address}</div> : null}
+            {address2 ? <div className={s.address}>{address2}</div> : null}
+          </div>
+          {/*<div className={s.parkingAddress}>
+            <div className={s.addressLabel}>Parking:</div>
+            <div className={s.address}>800 Rectenwald St.</div>
+            <div className={s.address}>Pittsburgh, PA 15210</div>
+          </div>*/}
         </div>
       </header>
 

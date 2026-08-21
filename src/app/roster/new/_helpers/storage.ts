@@ -99,6 +99,7 @@ function normalizeDraft(raw: unknown): Draft {
     opponent: typeof record.opponent === "string" ? record.opponent : "",
     matchDate: typeof record.matchDate === "string" ? record.matchDate : "",
     kickoff: typeof record.kickoff === "string" ? record.kickoff : "",
+    timezone: typeof record.timezone === "string" ? record.timezone : "",
     venue: isVenue(record.venue) ? record.venue : "Home",
     // Legacy drafts stored the level under `competition`; Division is the label now.
     division:

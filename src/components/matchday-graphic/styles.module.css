@@ -1,7 +1,8 @@
 /* Native-pixel Matchday Squad graphic. Format variants via data-format. */
 
 .root {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   position: relative;
   box-sizing: border-box;
   overflow: hidden;
@@ -11,7 +12,8 @@
     var(--color-grey-900) 100%
   );
   color: var(--color-white);
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family:
+    var(--font-montserrat), "Helvetica Neue", Helvetica, Arial, sans-serif;
   flex-shrink: 0;
 
   /* Backdrop sits behind all content */
@@ -37,7 +39,260 @@
     position: relative;
     z-index: 1;
   }
+}
 
+.header {
+  display: flex;
+  align-items: stretch;
+  gap: 24px;
+  padding: 28px 24px;
+  border-bottom: 4px solid var(--color-primary);
+
+  .logoWrap {
+    display: flex;
+    align-items: center;
+  }
+
+  .logo {
+    width: 150px;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  .titles {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 14px;
+  }
+
+  .clubName {
+    margin: 0;
+    font-family:
+      var(--font-bakbak-one), "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 54px;
+    letter-spacing: 1px;
+    color: var(--color-primary);
+    font-weight: 400;
+    line-height: 0.5;
+  }
+
+  .subTitle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+    padding-top: 4px;
+    font-family:
+      var(--font-bakbak-one), "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 30px;
+    font-weight: 400;
+    color: var(--color-white);
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .dateVenue {
+    display: flex;
+    gap: 16px;
+  }
+
+  .date {
+    font-family:
+      var(--font-montserrat), "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .matchup {
+    color: var(--color-grey-500);
+    font-size: 30px;
+  }
+
+  .addresses {
+    margin-left: auto;
+    text-align: right;
+    font-size: 20px;
+    line-height: 1.5;
+    flex-shrink: 0;
+  }
+
+  .addressLabel {
+    font-family:
+      var(--font-montserrat), "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .address {
+    font-family:
+      var(--font-bakbak-one), "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 24px;
+    letter-spacing: 1px;
+    font-weight: 600;
+    color: var(--color-white);
+    padding-top: 4px;
+  }
+
+  .venueKickoff {
+    font-family:
+      var(--font-montserrat), "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1;
+    text-transform: uppercase;
+    background-color: var(--color-gold);
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: var(--color-black);
+  }
+}
+
+.group {
+  padding: 8px 24px 0;
+}
+
+.groupTitle {
+  margin: 0;
+  padding-bottom: 8px;
+  font-family:
+    var(--font-montserrat), "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-danger);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.grid {
+  display: grid;
+  gap: 12px 8px;
+}
+
+/* Starting lineup 1–15: three rows of five */
+.gridStarters {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+/*
+ * Finishers: one row of eight equal slots. Partial benches keep the same
+ * slot width and center in the row (flex, not a stretched 8-col grid).
+ */
+.gridFinishers {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  column-gap: 8px;
+  row-gap: 16px;
+
+  .slot {
+    flex: 0 0 calc((100% - 56px) / 8);
+    max-width: calc((100% - 56px) / 8);
+    box-sizing: border-box;
+  }
+}
+
+.slot {
+  text-align: center;
+  min-width: 0;
+
+  .photoWrap {
+    position: relative;
+    display: inline-block;
+    border-radius: 50%;
+    border: 3px solid var(--color-black);
+  }
+
+  .photo {
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--color-grey-800);
+    display: block;
+    margin: 0 auto;
+  }
+
+  .jersey {
+    position: absolute;
+    border-radius: 50%;
+    background: var(--color-danger);
+    color: var(--color-white);
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--color-black);
+    line-height: 1;
+  }
+
+  .name {
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+
+  .position {
+    color: var(--color-grey-600);
+    overflow-wrap: anywhere;
+  }
+}
+
+.sponsors {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  box-sizing: border-box;
+
+  .sponsorsLabel {
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: var(--color-primary);
+    text-transform: uppercase;
+  }
+
+  .sponsorsLogos {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 100%;
+    gap: 16px;
+
+    .sponsorLogo {
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      flex: 1 1 0;
+      min-width: 0;
+    }
+  }
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--color-primary);
+  color: var(--color-black);
+  font-weight: 800;
+  text-align: center;
+  letter-spacing: 1px;
+  box-sizing: border-box;
+}
+
+.root {
   /*
    * Portrait / Post 1080×1350 — 5-across starters get larger headshots;
    * 8-across finishers stay tighter so one bench row fits the canvas width.
@@ -234,213 +489,4 @@
       font-size: 24px;
     }
   }
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 20px 32px 18px;
-  border-bottom: 4px solid var(--color-primary);
-
-  .logo {
-    width: 140px;
-    height: 140px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    flex-shrink: 0;
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-  }
-
-  .titles {
-    min-width: 0;
-  }
-
-  .clubName {
-    margin: 0;
-    font-family:
-      var(--font-bakbak-one), "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: 54px;
-    letter-spacing: 1px;
-    color: var(--color-primary);
-    font-weight: 400;
-    line-height: 1.1;
-  }
-
-  .subTitle {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin: 0;
-    padding-top: 4px;
-    font-family:
-      var(--font-bakbak-one), "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: 30px;
-    font-weight: 400;
-    color: var(--color-white);
-    line-height: 1;
-    text-transform: uppercase;
-  }
-
-  .matchup {
-    color: var(--color-grey-500);
-    font-size: 30px;
-  }
-
-  .match {
-    margin-left: auto;
-    text-align: right;
-    font-size: 20px;
-    line-height: 1.5;
-    flex-shrink: 0;
-
-    b {
-      color: var(--color-primary);
-    }
-  }
-
-  .address {
-    font-size: 20px;
-    color: var(--color-white);
-    padding-top: 4px;
-  }
-}
-
-.group {
-  padding: 8px 24px 0;
-}
-
-.groupTitle {
-  margin: 0;
-  padding-bottom: 8px;
-  font-family:
-    var(--font-montserrat), "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--color-danger);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.grid {
-  display: grid;
-  gap: 12px 8px;
-}
-
-/* Starting lineup 1–15: three rows of five */
-.gridStarters {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-}
-
-/*
- * Finishers: one row of eight equal slots. Partial benches keep the same
- * slot width and center in the row (flex, not a stretched 8-col grid).
- */
-.gridFinishers {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  column-gap: 8px;
-  row-gap: 16px;
-
-  .slot {
-    flex: 0 0 calc((100% - 56px) / 8);
-    max-width: calc((100% - 56px) / 8);
-    box-sizing: border-box;
-  }
-}
-
-.slot {
-  text-align: center;
-  min-width: 0;
-
-  .photoWrap {
-    position: relative;
-    display: inline-block;
-    border-radius: 50%;
-    border: 3px solid var(--color-black);
-  }
-
-  .photo {
-    border-radius: 50%;
-    object-fit: cover;
-    background: var(--color-grey-800);
-    display: block;
-    margin: 0 auto;
-  }
-
-  .jersey {
-    position: absolute;
-    border-radius: 50%;
-    background: var(--color-danger);
-    color: var(--color-white);
-    font-weight: 800;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid var(--color-black);
-    line-height: 1;
-  }
-
-  .name {
-    font-weight: 700;
-    overflow-wrap: anywhere;
-  }
-
-  .position {
-    color: var(--color-grey-600);
-    overflow-wrap: anywhere;
-  }
-}
-
-.sponsors {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  box-sizing: border-box;
-
-  .sponsorsLabel {
-    font-weight: 800;
-    letter-spacing: 1.5px;
-    color: var(--color-primary);
-    text-transform: uppercase;
-  }
-
-  .sponsorsLogos {
-    display: flex;
-    align-items: center;
-    justify-content: space-evenly;
-    width: 100%;
-    gap: 16px;
-
-    .sponsorLogo {
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center;
-      flex: 1 1 0;
-      min-width: 0;
-    }
-  }
-}
-
-.footer {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--color-primary);
-  color: var(--color-black);
-  font-weight: 800;
-  text-align: center;
-  letter-spacing: 1px;
-  box-sizing: border-box;
 }

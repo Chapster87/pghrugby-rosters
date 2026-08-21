@@ -70,6 +70,20 @@
   }
 }
 
+.row3 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+
+  @media (--viewport-sm-up) {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  & .field {
+    margin-bottom: 10px;
+  }
+}
+
 .note {
   margin: 0;
   font-size: 11px;

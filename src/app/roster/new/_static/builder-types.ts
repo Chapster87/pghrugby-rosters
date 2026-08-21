@@ -10,6 +10,8 @@ export type MatchDetails = {
   opponent: string
   matchDate: string
   kickoff: string
+  /** Optional free-text timezone for the kickoff (e.g. ET). */
+  timezone: string
   venue: Venue
   /** Optional free-text level/flight within a League (distinguishes same-day games). */
   division: string

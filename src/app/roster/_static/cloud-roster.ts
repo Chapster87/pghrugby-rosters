@@ -27,6 +27,8 @@ export type CloudRosterState = {
     opponent: string
     match_date: string | null
     kickoff: string
+    /** Optional free-text timezone for the kickoff (e.g. ET). */
+    timezone: string
     venue: Venue
     address: string
     /** Second address line (rendered below Address on the graphic). */

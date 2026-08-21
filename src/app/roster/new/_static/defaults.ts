@@ -21,6 +21,7 @@ export function createEmptyMatchDetails(): MatchDetails {
     opponent: "",
     matchDate: "",
     kickoff: "",
+    timezone: "",
     venue: "Home",
     division: "",
     address: "",

@@ -77,7 +77,7 @@ export default function MatchDetailsPanel({
           />
         </label>
 
-        <div className={s.row2}>
+        <div className={s.row3}>
           <label className={s.field}>
             <span className={s.label}>Date</span>
             <input
@@ -94,6 +94,16 @@ export default function MatchDetailsPanel({
               className={s.input}
               value={value.kickoff}
               onChange={(event) => onChange({ kickoff: event.target.value })}
+            />
+          </label>
+          <label className={s.field}>
+            <span className={s.label}>Timezone (optional)</span>
+            <input
+              type="text"
+              className={s.input}
+              value={value.timezone}
+              placeholder="e.g. ET"
+              onChange={(event) => onChange({ timezone: event.target.value })}
             />
           </label>
         </div>

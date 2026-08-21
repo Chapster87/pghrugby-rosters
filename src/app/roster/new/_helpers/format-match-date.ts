@@ -13,5 +13,6 @@ export function formatMatchDate(matchDate: string): string {
     weekday: "short",
     month: "short",
     day: "numeric",
+    year: "numeric",
   })
 }
