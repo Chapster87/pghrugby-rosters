@@ -37,6 +37,8 @@ type SlotView = {
   name: string
   position: string
   photoSrc: string
+  /** True when the photo falls back to the club crest (no library match). */
+  isPlaceholder: boolean
 }
 
 /** First jersey number on the bench graphic (after Starting Lineup 1–15). */
@@ -66,12 +68,14 @@ function buildGroupSlots(
     // editor slot does not leave a gap on the graphic (16, 17, 18…).
     const displayNumber =
       group === "finishers" ? FINISHER_DISPLAY_START + index : def.number
+    const hasLibraryPhoto = Boolean(name && playerLibrary[name])
     return {
       slotNumber: def.number,
       displayNumber,
       name,
       position,
       photoSrc: resolveSlotPhotoSrc(name, playerLibrary, clubLogoSrc),
+      isPlaceholder: !hasLibraryPhoto,
     }
   })
 }
@@ -100,7 +104,7 @@ function SlotCell({
         <img
           src={slot.photoSrc}
           alt=""
-          className={s.photo}
+          className={`${s.photo}${slot.isPlaceholder ? ` ${s.placeholder}` : ""}`}
           draggable={false}
           crossOrigin={corsModeForImageSrc(slot.photoSrc)}
           onError={(event) => {
@@ -225,26 +229,13 @@ export default function MatchdayGraphic({
         </div>
       </header>
 
-      <section className={s.group}>
-        <h3 className={s.groupTitle}>Starters</h3>
-        <div className={`${s.grid} ${s.gridStarters}`}>
-          {starters.map((slot) => (
-            <SlotCell
-              key={slot.slotNumber}
-              slot={slot}
-              clubLogoSrc={clubLogoSrc}
-            />
-          ))}
-        </div>
-      </section>
-
-      {finishers.length > 0 ? (
-        <section
-          className={`${s.group} ${s.groupFinishers} ${finisherRowsClass}`}
-        >
-          <h3 className={s.groupTitle}>Finishers</h3>
-          <div className={`${s.grid} ${s.gridFinishers}`}>
-            {finishers.map((slot) => (
+      <section className={s.roster}>
+        <div className={s.group}>
+          <div className={s.groupHeader}>
+            <h3 className={s.groupTitle}>Starters</h3>
+          </div>
+          <div className={`${s.grid} ${s.gridStarters}`}>
+            {starters.map((slot) => (
               <SlotCell
                 key={slot.slotNumber}
                 slot={slot}
@@ -252,8 +243,27 @@ export default function MatchdayGraphic({
               />
             ))}
           </div>
-        </section>
-      ) : null}
+        </div>
+
+        {finishers.length > 0 ? (
+          <div
+            className={`${s.group} ${s.groupFinishers} ${finisherRowsClass}`}
+          >
+            <div className={s.groupHeader}>
+              <h3 className={s.groupTitle}>Finishers</h3>
+            </div>
+            <div className={`${s.grid} ${s.gridFinishers}`}>
+              {finishers.map((slot) => (
+                <SlotCell
+                  key={slot.slotNumber}
+                  slot={slot}
+                  clubLogoSrc={clubLogoSrc}
+                />
+              ))}
+            </div>
+          </div>
+        ) : null}
+      </section>
 
       {filledSponsors.length > 0 ? (
         <div className={s.sponsors}>
