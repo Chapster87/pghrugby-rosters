@@ -1,3 +1,6 @@
+import Image from "next/image"
+import Link from "@components/link"
+
 import s from "./styles.module.css"
 import AuthStatus from "./_components/auth-status"
 
@@ -9,18 +12,17 @@ export default function Header() {
     <header className={s.header}>
       <div className={s.headerInner}>
         <div className={s.brand}>
-          <img
-            className={s.crest}
-            src={CREST_SRC}
-            alt=""
-            width={40}
-            height={40}
-            draggable={false}
-          />
+          <Link href="/">
+            <Image
+              className={s.crest}
+              src={CREST_SRC}
+              alt=""
+              width={40}
+              height={40}
+            />
+          </Link>
           <div className={s.brandText}>
-            <h1 className={s.title}>
-              Pittsburgh Forge — Weekly Roster Builder
-            </h1>
+            <h1 className={s.title}>Pittsburgh Forge — Roster Builder</h1>
             <p className={s.subtitle}>
               Build matchday squad graphics for social — Portrait and Story PNG
               export.

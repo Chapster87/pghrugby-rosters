@@ -4,16 +4,16 @@ import type {
   Draft,
   PlayerLibrary,
   Sponsors,
-} from "../../../../_static/builder-types"
-import type { GraphicFormat } from "../../../../_static/graphic-formats"
+} from "../../app/roster/new/_static/builder-types"
+import type { GraphicFormat } from "../../app/roster/new/_static/graphic-formats"
 import {
   getRosterSlotsByGroup,
   type RosterSlotGroup,
-} from "../../../../_static/roster-slots"
-import { LEAGUE_LABEL } from "../../../../../_static/cloud-roster"
-import { corsModeForImageSrc } from "../../../../_helpers/export-png"
-import { formatMatchDate } from "../../../../_helpers/format-match-date"
-import { resolveSlotPhotoSrc } from "../../../../_helpers/resolve-slot-photo"
+} from "../../app/roster/new/_static/roster-slots"
+import { LEAGUE_LABEL } from "../../app/roster/_static/cloud-roster"
+import { corsModeForImageSrc } from "../../app/roster/new/_helpers/export-png"
+import { formatMatchDate } from "../../app/roster/new/_helpers/format-match-date"
+import { resolveSlotPhotoSrc } from "../../app/roster/new/_helpers/resolve-slot-photo"
 
 import s from "./styles.module.css"
 
@@ -145,6 +145,7 @@ export default function MatchdayGraphic({
   const leagueLabel = draft.league ? LEAGUE_LABEL[draft.league] : ""
   const division = draft.division.trim()
   const address = draft.address.trim()
+  const address2 = draft.address2.trim()
   const filledSponsors = sponsors.filter(Boolean)
 
   const starters = buildStarterSlots(draft, playerLibrary, clubLogoSrc)
@@ -205,6 +206,7 @@ export default function MatchdayGraphic({
           </div>
           <div>{draft.venue}</div>
           {address ? <div className={s.address}>{address}</div> : null}
+          {address2 ? <div className={s.address}>{address2}</div> : null}
         </div>
       </header>
 
@@ -243,19 +245,21 @@ export default function MatchdayGraphic({
           <div className={s.sponsorsLabel}>Proud Sponsors</div>
           <div className={s.sponsorsLogos}>
             {filledSponsors.map((src, index) => (
-              <img
+              // html2canvas ignores object-fit; background-size: contain
+              // preserves logo aspect in the PNG export.
+              <div
                 key={`sponsor-${index}`}
-                src={src}
-                alt=""
-                draggable={false}
-                crossOrigin={corsModeForImageSrc(src)}
+                className={s.sponsorLogo}
+                style={{ backgroundImage: `url("${src}")` }}
+                role="img"
+                aria-label=""
               />
             ))}
           </div>
         </div>
       ) : null}
 
-      <footer className={s.footer}>FORWARD WITH HONOR · #ForgeRugby</footer>
+      {/*<footer className={s.footer}>FORWARD WITH HONOR · #ForgeRugby</footer>*/}
     </div>
   )
 }

@@ -17,7 +17,7 @@ import {
   buildExportFilename,
   exportElementAsPng,
 } from "../../_helpers/export-png"
-import MatchdayGraphic from "./_components/matchday-graphic"
+import MatchdayGraphic from "@components/matchday-graphic"
 
 import s from "./styles.module.css"
 
