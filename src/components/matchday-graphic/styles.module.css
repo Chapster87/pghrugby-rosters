@@ -16,12 +16,8 @@
     var(--font-montserrat), "Helvetica Neue", Helvetica, Arial, sans-serif;
   flex-shrink: 0;
 
-  /* Backdrop sits behind all content */
+  /* Backdrop sits behind all content; fill positions it via inline style */
   .background {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
     object-fit: cover;
     z-index: 0;
   }
@@ -54,6 +50,7 @@
   }
 
   .logo {
+    position: relative;
     width: 150px;
     height: 150px;
     display: flex;
@@ -327,9 +324,9 @@
     .gridStarters {
       padding: 0 24px;
 
-      .photo {
-        width: 165px;
-        height: 165px;
+      .photoWrap {
+        width: 171px;
+        height: 171px;
       }
 
       .jersey {
@@ -353,9 +350,9 @@
     }
 
     .gridFinishers {
-      .photo {
-        width: 116px;
-        height: 116px;
+      .photoWrap {
+        width: 122px;
+        height: 122px;
       }
 
       .jersey {
@@ -410,9 +407,9 @@
     }
 
     .gridStarters {
-      .photo {
-        width: 168px;
-        height: 168px;
+      .photoWrap {
+        width: 174px;
+        height: 174px;
       }
 
       .jersey {
@@ -444,9 +441,9 @@
         max-width: calc((100% - 56px) / 8);
       }
 
-      .photo {
-        width: 104px;
-        height: 104px;
+      .photoWrap {
+        width: 110px;
+        height: 110px;
       }
 
       .jersey {

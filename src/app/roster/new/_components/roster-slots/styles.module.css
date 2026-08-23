@@ -76,15 +76,20 @@
   outline-offset: 1px;
 }
 
-/* Photo only when library matches; empty cell keeps the grid column. */
+/* Positioned box for the fill Image; empty cell keeps the grid column. */
 .thumb {
+  position: relative;
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  object-fit: cover;
+  overflow: hidden;
   background-color: #e5e5e5;
   border: 1px solid #ccc;
   justify-self: end;
+}
+
+.thumbImg {
+  object-fit: cover;
 }
 
 .thumbSlot {

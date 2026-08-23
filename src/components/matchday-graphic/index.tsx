@@ -1,5 +1,7 @@
 "use client"
 
+import Image from "next/image"
+
 import type {
   Draft,
   PlayerLibrary,
@@ -101,11 +103,13 @@ function SlotCell({
   return (
     <div className={s.slot}>
       <div className={s.photoWrap}>
-        <img
+        <Image
           src={slot.photoSrc}
           alt=""
+          fill
           className={`${s.photo}${slot.isPlaceholder ? ` ${s.placeholder}` : ""}`}
           draggable={false}
+          loading="eager"
           crossOrigin={corsModeForImageSrc(slot.photoSrc)}
           onError={(event) => {
             event.currentTarget.onerror = null
@@ -174,11 +178,13 @@ export default function MatchdayGraphic({
       aria-label={`Matchday Squad graphic, ${format.label} ${format.width} by ${format.height}`}
     >
       {backgroundImage ? (
-        <img
+        <Image
           src={backgroundImage}
           alt=""
+          fill
           className={s.background}
           draggable={false}
+          loading="eager"
           crossOrigin={corsModeForImageSrc(backgroundImage)}
           onError={(event) => {
             // A broken backdrop is worse than the default gradient.
@@ -189,10 +195,12 @@ export default function MatchdayGraphic({
       <header className={s.header}>
         <div className={s.logoWrap}>
           <div className={s.logo}>
-            <img
+            <Image
               src={clubLogoSrc}
               alt=""
+              fill
               draggable={false}
+              loading="eager"
               crossOrigin={corsModeForImageSrc(clubLogoSrc)}
             />
           </div>

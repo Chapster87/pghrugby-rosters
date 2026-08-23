@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState, type FormEvent } from "react"
+import Image from "next/image"
 
 import type { PlayerLibrary } from "../../_static/builder-types"
 import { toDriveDirectLink } from "../../_helpers/drive-url"
@@ -107,15 +108,19 @@ export default function PlayerLibraryPanel({
         <ul className={s.list}>
           {names.map((playerName) => (
             <li key={playerName} className={s.chip}>
-              <img
-                src={library[playerName]}
-                alt=""
-                className={s.chipThumb}
-                onError={(event) => {
-                  event.currentTarget.onerror = null
-                  event.currentTarget.src = clubLogoSrc
-                }}
-              />
+              <span className={s.chipThumb}>
+                <Image
+                  src={library[playerName]}
+                  alt=""
+                  fill
+                  className={s.chipThumbImg}
+                  loading="eager"
+                  onError={(event) => {
+                    event.currentTarget.onerror = null
+                    event.currentTarget.src = clubLogoSrc
+                  }}
+                />
+              </span>
               <span className={s.chipName}>{playerName}</span>
               <button
                 type="button"

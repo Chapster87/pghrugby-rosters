@@ -126,12 +126,18 @@
   border: none;
 }
 
+/* Positioned box for the fill Image; the img fills and cover-crops. */
 .chipThumb {
+  position: relative;
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  object-fit: cover;
+  overflow: hidden;
   background-color: #ddd;
+}
+
+.chipThumbImg {
+  object-fit: cover;
 }
 
 .chipName {

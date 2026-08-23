@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
+import Image from "next/image"
 import { supabase } from "@/utils/supabase"
 import { useAuth } from "@/hooks/use-auth"
 import Button from "@/components/button"
@@ -242,13 +243,14 @@ function Empty({ filter }: { filter: Filter }) {
 function SignedOutGate() {
   return (
     <div className={s.gate}>
-      <img
+      <Image
         className={s.crest}
         src={CREST_SRC}
         alt=""
         width={56}
         height={56}
         draggable={false}
+        loading="eager"
       />
       <Heading level="h2" className={s.gateTitle}>
         Sign in to manage Rosters

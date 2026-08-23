@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, type FormEvent } from "react"
+import Image from "next/image"
 
 import type { Sponsors } from "../../_static/builder-types"
 import { SPONSOR_SLOT_COUNT } from "../../_static/builder-types"
@@ -135,7 +136,15 @@ export default function SponsorsPanel({
           {sponsors.map((src, index) =>
             src ? (
               <li key={index} className={s.chip}>
-                <img src={src} alt="" className={s.chipThumb} />
+                <span className={s.chipThumb}>
+                  <Image
+                    src={src}
+                    alt=""
+                    fill
+                    className={s.chipThumbImg}
+                    loading="eager"
+                  />
+                </span>
                 <div className={s.chipControls}>
                   <button
                     type="button"

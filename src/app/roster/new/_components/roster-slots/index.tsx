@@ -1,6 +1,7 @@
 "use client"
 
 import { useId, useMemo } from "react"
+import Image from "next/image"
 
 import type {
   Draft,
@@ -96,7 +97,15 @@ export default function RosterSlotsPanel({
                       }
                     />
                     {photoUrl ? (
-                      <img src={photoUrl} alt="" className={s.thumb} />
+                      <span className={s.thumb}>
+                        <Image
+                          src={photoUrl}
+                          alt=""
+                          fill
+                          className={s.thumbImg}
+                          loading="eager"
+                        />
+                      </span>
                     ) : (
                       <span className={s.thumbSlot} aria-hidden="true" />
                     )}

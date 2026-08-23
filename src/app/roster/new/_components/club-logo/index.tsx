@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, type FormEvent } from "react"
+import Image from "next/image"
 
 import { toDriveDirectLink } from "../../_helpers/drive-url"
 
@@ -46,7 +47,13 @@ export default function ClubLogoPanel({
       </h2>
 
       <div className={s.preview}>
-        <img src={clubLogoSrc} alt="Club Logo" className={s.image} />
+        <Image
+          src={clubLogoSrc}
+          alt="Club Logo"
+          fill
+          className={s.image}
+          loading="eager"
+        />
       </div>
 
       <form className={s.addRow} onSubmit={handleSubmit}>

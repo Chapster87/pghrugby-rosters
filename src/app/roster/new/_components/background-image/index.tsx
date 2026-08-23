@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, type KeyboardEvent } from "react"
+import Image from "next/image"
 
 import { toDriveDirectLink } from "../../_helpers/drive-url"
 
@@ -76,9 +77,7 @@ export default function BackgroundImagePanel({
 
       <div className={s.preview}>
         {value ? (
-          // eslint-disable-next-line @next/next/no-img-element -- next/image
-          // sweep is its own ticket; graphic export relies on plain img + CORS
-          <img src={value} alt="" className={s.image} />
+          <Image src={value} alt="" fill className={s.image} loading="eager" />
         ) : (
           <span className={s.placeholder} aria-hidden="true" />
         )}

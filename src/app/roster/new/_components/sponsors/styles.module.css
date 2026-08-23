@@ -123,12 +123,17 @@
 
 /* Sponsor logos are wide marks, not headshots: square thumb, contain-fit. */
 .chipThumb {
+  position: relative;
   width: 30px;
   height: 30px;
   border-radius: 6px;
-  object-fit: contain;
+  overflow: hidden;
   background-color: var(--color-white);
   border: 1px solid #eee;
+}
+
+.chipThumbImg {
+  object-fit: contain;
 }
 
 .chipControls {

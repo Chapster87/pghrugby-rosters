@@ -17,6 +17,7 @@
 
 /* Square preview tile; dashed until a logo is set. */
 .preview {
+  position: relative;
   width: 64px;
   height: 64px;
   border-radius: 8px;
