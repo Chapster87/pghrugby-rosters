@@ -78,6 +78,12 @@ export type UseBuilderStateResult = {
   setPlayerLibrary: (library: PlayerLibrary) => void
   upsertPlayerLibraryEntry: (name: string, photoUrl: string) => void
   removePlayerLibraryEntry: (name: string) => void
+  /**
+   * Rename a library entry, keeping its photo. Matching Roster Slots are
+   * renamed too so their photos keep filling in. Returns an error message,
+   * or null on success.
+   */
+  renamePlayerLibraryEntry: (oldName: string, newName: string) => string | null
   setSponsors: (sponsors: Sponsors) => void
   updateSponsorSlot: (index: number, dataUrl: string) => void
   clearSponsorSlot: (index: number) => void
@@ -340,6 +346,56 @@ export function useBuilderState(
     [state.draft.league, userId]
   )
 
+  const renamePlayerLibraryEntry = useCallback(
+    (oldName: string, newName: string): string | null => {
+      const league = state.draft.league
+      if (!league) return "Choose a League before renaming players."
+      const from = oldName.trim()
+      const to = newName.trim()
+      if (!to) return "Player name can't be empty."
+      if (to === from) return null
+      const photoUrl = state.playerLibrary[from]
+      if (!photoUrl) return "Player not found in the library."
+      if (to in state.playerLibrary) {
+        return "A player with that name already exists."
+      }
+
+      // Move the entry so the photo follows the new name (local + cloud).
+      const playerLibrary = { ...state.playerLibrary }
+      delete playerLibrary[from]
+      playerLibrary[to] = photoUrl
+      savePlayerLibrary(league, playerLibrary)
+      setState((prev) => ({ ...prev, playerLibrary }))
+      if (userId) {
+        void upsertPlayerLibraryEntries(league, [
+          { player_name: to, photo_url: photoUrl },
+        ])
+          .then(() => removeCloudPlayerLibraryEntry(league, from))
+          .catch(() => {})
+      }
+
+      // Rename any Roster Slot already using the old name so its photo keeps
+      // matching — orphaned names would silently lose their photo.
+      const slotRenames: Array<[number, string]> = []
+      for (const [numStr, slot] of Object.entries(state.draft.slots)) {
+        if (slot.name.trim() === from) slotRenames.push([Number(numStr), to])
+      }
+      if (slotRenames.length > 0) {
+        setState((prev) => {
+          const slots = { ...prev.draft.slots }
+          for (const [num, name] of slotRenames) {
+            slots[num] = { ...slots[num], name }
+          }
+          const draft: Draft = { ...prev.draft, slots }
+          if (!seed) saveDraft(draft)
+          return { ...prev, draft }
+        })
+      }
+      return null
+    },
+    [seed, state.draft.league, state.draft.slots, state.playerLibrary, userId]
+  )
+
   const setSponsorsState = useCallback((sponsors: Sponsors) => {
     saveSponsors(sponsors)
     setState((prev) => ({ ...prev, sponsors }))
@@ -466,6 +522,7 @@ export function useBuilderState(
     setPlayerLibrary,
     upsertPlayerLibraryEntry,
     removePlayerLibraryEntry,
+    renamePlayerLibraryEntry,
     setSponsors: setSponsorsState,
     updateSponsorSlot,
     clearSponsorSlot,

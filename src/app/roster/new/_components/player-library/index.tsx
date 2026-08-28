@@ -1,6 +1,12 @@
 "use client"
 
-import { useMemo, useState, type FormEvent } from "react"
+import {
+  useMemo,
+  useRef,
+  useState,
+  type FormEvent,
+  type KeyboardEvent,
+} from "react"
 import Image from "next/image"
 
 import type { PlayerLibrary } from "../../_static/builder-types"
@@ -16,6 +22,8 @@ type PlayerLibraryPanelProps = {
   league: LeagueId | ""
   onUpsert: (name: string, photoUrl: string) => void
   onRemove: (name: string) => void
+  /** Rename a library entry; returns an error message or null on success. */
+  onRename: (oldName: string, newName: string) => string | null
 }
 
 /**
@@ -28,10 +36,12 @@ export default function PlayerLibraryPanel({
   league,
   onUpsert,
   onRemove,
+  onRename,
 }: PlayerLibraryPanelProps) {
   const [name, setName] = useState("")
   const [url, setUrl] = useState("")
   const [error, setError] = useState<string | null>(null)
+  const [renameError, setRenameError] = useState<string | null>(null)
 
   const names = useMemo(
     () => Object.keys(library).sort((a, b) => a.localeCompare(b)),
@@ -121,7 +131,11 @@ export default function PlayerLibraryPanel({
                   }}
                 />
               </span>
-              <span className={s.chipName}>{playerName}</span>
+              <EditableName
+                name={playerName}
+                onRename={onRename}
+                onError={setRenameError}
+              />
               <button
                 type="button"
                 className={s.removeChip}
@@ -135,6 +149,8 @@ export default function PlayerLibraryPanel({
         </ul>
       )}
 
+      {renameError ? <p className={s.error}>{renameError}</p> : null}
+
       <p className={s.note}>
         In Google Drive: right-click the photo → Share → &quot;Anyone with the
         link&quot; → Copy link, then paste it here. Paste any Drive share link —
@@ -142,12 +158,91 @@ export default function PlayerLibraryPanel({
       </p>
       <p className={s.note}>
         Once a player&apos;s added, pick them from the roster below and the
-        photo fills in automatically.
+        photo fills in automatically. Click a name to rename it — Roster Slots
+        that already use the name update too.
       </p>
       <p className={s.note}>
         {LEAGUE_LABEL[league]} pool — Men&apos;s and Women&apos;s libraries stay
         separate.
       </p>
     </section>
+  )
+}
+
+type EditableNameProps = {
+  name: string
+  onRename: (oldName: string, newName: string) => string | null
+  /** Surface a rename failure (e.g. duplicate name) at the panel level. */
+  onError: (message: string | null) => void
+}
+
+/**
+ * Click-to-rename player name. Commits on blur or Enter, cancels on Escape;
+ * the photo follows the new name via the library rename.
+ */
+function EditableName({ name, onRename, onError }: EditableNameProps) {
+  const [editing, setEditing] = useState(false)
+  const [value, setValue] = useState(name)
+  const cancelRef = useRef(false)
+
+  function startEditing() {
+    setValue(name)
+    cancelRef.current = false
+    onError(null)
+    setEditing(true)
+  }
+
+  function commit() {
+    const next = value.trim()
+    if (!next || next === name) {
+      setEditing(false)
+      return
+    }
+    onError(onRename(name, next))
+    setEditing(false)
+  }
+
+  function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "Enter") {
+      event.preventDefault()
+      event.currentTarget.blur() // commit via onBlur
+    } else if (event.key === "Escape") {
+      cancelRef.current = true
+      event.currentTarget.blur()
+    }
+  }
+
+  if (editing) {
+    return (
+      <input
+        type="text"
+        className={s.chipNameInput}
+        value={value}
+        aria-label={`Rename ${name}`}
+        autoFocus
+        onChange={(event) => setValue(event.target.value)}
+        onFocus={(event) => event.currentTarget.select()}
+        onBlur={() => {
+          if (cancelRef.current) {
+            cancelRef.current = false
+            setEditing(false)
+            return
+          }
+          commit()
+        }}
+        onKeyDown={handleKeyDown}
+      />
+    )
+  }
+
+  return (
+    <button
+      type="button"
+      className={s.chipName}
+      title="Click to rename"
+      onClick={startEditing}
+    >
+      {name}
+    </button>
   )
 }

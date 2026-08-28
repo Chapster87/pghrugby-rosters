@@ -147,6 +147,38 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: 180px;
+  /* Button reset — clickable name opens the inline rename */
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: inherit;
+  cursor: text;
+}
+
+.chipName:hover {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 2px;
+}
+
+.chipNameInput {
+  width: 150px;
+  max-width: 100%;
+  padding: 2px 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: var(--color-white);
+  color: var(--color-black);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.chipNameInput:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 0;
 }
 
 .removeChip {

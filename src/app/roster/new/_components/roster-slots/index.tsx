@@ -1,6 +1,6 @@
 "use client"
 
-import { useId, useMemo } from "react"
+import { useMemo } from "react"
 import Image from "next/image"
 
 import type {
@@ -12,6 +12,7 @@ import {
   ROSTER_SLOT_GROUPS,
   getRosterSlotsByGroup,
 } from "../../_static/roster-slots"
+import PlayerNameCombobox from "../player-name-combobox"
 
 import s from "./styles.module.css"
 
@@ -23,7 +24,8 @@ type RosterSlotsPanelProps = {
 
 /**
  * Roster Slot editors grouped by forwards / backs / finishers.
- * Name fields autocomplete from the Player Library; photo thumb fills on name match.
+ * Name fields use a Radix combobox fed by the Player Library; photo thumb
+ * fills on exact name match.
  * Finishers stay editable here even when unnamed (graphic omits empty finishers later).
  */
 export default function RosterSlotsPanel({
@@ -31,20 +33,20 @@ export default function RosterSlotsPanel({
   playerLibrary,
   onSlotChange,
 }: RosterSlotsPanelProps) {
-  const listId = useId()
-  const libraryNames = useMemo(
-    () => Object.keys(playerLibrary).sort((a, b) => a.localeCompare(b)),
-    [playerLibrary]
-  )
+  // Names already placed in any Roster Slot — the combobox hides them from
+  // every dropdown so each library player can only be picked once per Roster.
+  // Lowercased so a free-typed "john smith" also hides the "John Smith" pick.
+  const usedNames = useMemo(() => {
+    const set = new Set<string>()
+    for (const slot of Object.values(draft.slots)) {
+      const name = slot.name.trim().toLowerCase()
+      if (name) set.add(name)
+    }
+    return set
+  }, [draft.slots])
 
   return (
     <section className={s.section} aria-label="Roster Slots">
-      <datalist id={listId}>
-        {libraryNames.map((name) => (
-          <option key={name} value={name} />
-        ))}
-      </datalist>
-
       {ROSTER_SLOT_GROUPS.map((group) => {
         const slots = getRosterSlotsByGroup(group.id)
 
@@ -81,20 +83,14 @@ export default function RosterSlotsPanel({
                         })
                       }
                     />
-                    <input
+                    <PlayerNameCombobox
                       id={`name-${slot.number}`}
-                      type="text"
-                      className={s.nameInput}
-                      list={listId}
                       value={value.name}
+                      library={playerLibrary}
+                      usedElsewhere={usedNames}
                       placeholder="Player name"
-                      autoComplete="off"
                       aria-label={`Player name for jersey ${slot.number}`}
-                      onChange={(event) =>
-                        onSlotChange(slot.number, {
-                          name: event.target.value,
-                        })
-                      }
+                      onChange={(name) => onSlotChange(slot.number, { name })}
                     />
                     {photoUrl ? (
                       <span className={s.thumb}>

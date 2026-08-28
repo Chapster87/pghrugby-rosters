@@ -39,6 +39,7 @@ export default function RosterEditor({ builder, actions }: RosterEditorProps) {
           league={builder.draft.league}
           onUpsert={builder.upsertPlayerLibraryEntry}
           onRemove={builder.removePlayerLibraryEntry}
+          onRename={builder.renamePlayerLibraryEntry}
         />
 
         <RosterSlotsPanel
