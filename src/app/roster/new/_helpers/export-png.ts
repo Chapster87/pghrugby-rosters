@@ -1,5 +1,6 @@
 import type { Draft } from "../_static/builder-types"
 import type { GraphicFormat } from "../_static/graphic-formats"
+import { LEAGUE_LABEL } from "../../_static/cloud-roster"
 
 /**
  * Capture a full-resolution Matchday Squad graphic root as a PNG download.
@@ -50,34 +51,49 @@ export async function exportElementAsPng(
   }
 }
 
-/** Slug fragment safe for weekly social filenames. */
-function slugPart(value: string, maxLen = 32): string {
+/** Filename segment: keep alphanumerics; collapse the rest to a single dash. */
+function filePart(value: string, maxLen = 32): string {
   return value
     .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/['']/g, "")
+    .replace(/[^a-zA-Z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, maxLen)
 }
 
+/** `YYYY-MM-DD` → `MMDDYY` for the export filename; empty/invalid → today local. */
+function formatFilenameDate(matchDate: string): string {
+  const trimmed = matchDate.trim()
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+    const [, y, m, d] = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})$/) ?? []
+    if (y && m && d) return `${m}${d}${y.slice(-2)}`
+  }
+  const now = new Date()
+  const mm = String(now.getMonth() + 1).padStart(2, "0")
+  const dd = String(now.getDate()).padStart(2, "0")
+  const yy = String(now.getFullYear()).slice(-2)
+  return `${mm}${dd}${yy}`
+}
+
 /**
- * Sensible weekly social filename, e.g.
- * `pittsburgh-forge-roster-portrait.png` or
- * `pittsburgh-forge-roster-vs-old-as-2026-03-22-story.png`.
+ * Weekly social filename: `MMDDYY-League-Division.png`
+ * e.g. `082926-Womens-D2.png`. Division omitted when empty.
+ * Format id is unused in the name (one matchday graphic per export).
  */
 export function buildExportFilename(
-  format: GraphicFormat,
-  draft: Pick<Draft, "opponent" | "matchDate">
+  _format: GraphicFormat,
+  draft: Pick<Draft, "league" | "division" | "matchDate">
 ): string {
-  const parts = ["pittsburgh-forge-roster"]
+  const parts = [formatFilenameDate(draft.matchDate)]
 
-  const opponent = slugPart(draft.opponent)
-  if (opponent) parts.push("vs", opponent)
+  const league =
+    draft.league && LEAGUE_LABEL[draft.league]
+      ? filePart(LEAGUE_LABEL[draft.league])
+      : ""
+  if (league) parts.push(league)
 
-  const date = draft.matchDate.trim()
-  if (/^\d{4}-\d{2}-\d{2}$/.test(date)) parts.push(date)
-
-  parts.push(format.id)
+  const division = filePart(draft.division)
+  if (division) parts.push(division)
 
   return `${parts.join("-")}.png`
 }
@@ -86,9 +102,7 @@ export function buildExportFilename(
  * `crossOrigin` for graphic `<img>` tags so html2canvas can keep the canvas clean.
  * data:/blob: URLs stay origin-clean without CORS mode; remote http(s) need it.
  */
-export function corsModeForImageSrc(
-  src: string
-): "anonymous" | undefined {
+export function corsModeForImageSrc(src: string): "anonymous" | undefined {
   const value = (src || "").trim()
   if (!value) return undefined
   if (

@@ -57,6 +57,7 @@ export default function RosterSlotsPanel({
               {slots.map((slot) => {
                 const value = draft.slots[slot.number] ?? {
                   name: "",
+                  title: "",
                   position: slot.position,
                 }
                 const trimmedName = value.name.trim()
@@ -91,6 +92,21 @@ export default function RosterSlotsPanel({
                       placeholder="Player name"
                       aria-label={`Player name for jersey ${slot.number}`}
                       onChange={(name) => onSlotChange(slot.number, { name })}
+                    />
+                    <input
+                      id={`title-${slot.number}`}
+                      type="text"
+                      className={s.titleInput}
+                      value={value.title}
+                      placeholder="C, VC"
+                      maxLength={3}
+                      aria-label={`Title for jersey ${slot.number} (e.g. C, VC)`}
+                      title="Title (C, VC)"
+                      onChange={(event) =>
+                        onSlotChange(slot.number, {
+                          title: event.target.value,
+                        })
+                      }
                     />
                     {photoUrl ? (
                       <span className={s.thumb}>

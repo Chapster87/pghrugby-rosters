@@ -38,6 +38,8 @@ type SlotView = {
   /** Jersey badge shown on the graphic (sequential for finishers). */
   displayNumber: number
   name: string
+  /** Optional leadership mark (C / VC) shown next to the name. */
+  title: string
   position: string
   photoSrc: string
   /** True when the photo falls back to the club crest (no library match). */
@@ -66,6 +68,7 @@ function buildGroupSlots(
   return defs.map((def, index) => {
     const value = draft.slots[def.number]
     const name = value?.name?.trim() ?? ""
+    const title = value?.title?.trim() ?? ""
     const position = (value?.position ?? def.position).trim()
     // Starters keep fixed 1–15. Finishers renumber by filled order so a skipped
     // editor slot does not leave a gap on the graphic (16, 17, 18…).
@@ -76,6 +79,7 @@ function buildGroupSlots(
       slotNumber: def.number,
       displayNumber,
       name,
+      title,
       position,
       photoSrc: resolveSlotPhotoSrc(name, playerLibrary, clubLogoSrc),
       isPlaceholder: !hasLibraryPhoto,
@@ -122,7 +126,12 @@ function SlotCell({
           {slot.displayNumber}
         </span>
       </div>
-      <div className={s.name}>{slot.name || "—"}</div>
+      <div className={s.name}>
+        {slot.name || "—"}
+        {slot.title ? (
+          <span className={s.nameTitle}> ({slot.title})</span>
+        ) : null}
+      </div>
       <div className={s.position}>{slot.position}</div>
     </div>
   )

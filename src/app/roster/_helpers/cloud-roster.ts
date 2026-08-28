@@ -131,7 +131,13 @@ export function serializeRoster(write: RosterWrite): {
     const num = Number(numStr)
     // 1–15 always present (empty name OK); finishers 16+ only when filled.
     if (num <= FIXED_SLOT_MAX || slot.name.trim()) {
-      roster[numStr] = { player_name: slot.name, label: slot.position }
+      const entry: CloudRosterState["roster"][string] = {
+        player_name: slot.name,
+        label: slot.position,
+      }
+      const title = slot.title?.trim()
+      if (title) entry.title = title
+      roster[numStr] = entry
     }
   }
 
@@ -188,7 +194,7 @@ export function deserializeRoster(row: CloudRosterRow): DeserializedRoster {
   // Starters always present with default Position labels.
   for (const def of ROSTER_SLOT_DEFINITIONS) {
     if (def.number <= FIXED_SLOT_MAX) {
-      slots[def.number] = { name: "", position: def.position }
+      slots[def.number] = { name: "", title: "", position: def.position }
     }
   }
   const storedRoster = state?.roster ?? {}
@@ -198,6 +204,7 @@ export function deserializeRoster(row: CloudRosterRow): DeserializedRoster {
     const def = ROSTER_SLOT_DEFINITIONS.find((d) => d.number === num)
     slots[num] = {
       name: entry.player_name ?? "",
+      title: entry.title ?? "",
       position: entry.label || def?.position || "Finisher",
     }
   }

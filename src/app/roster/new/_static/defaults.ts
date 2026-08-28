@@ -35,6 +35,7 @@ export function createDefaultRosterSlots(): Record<number, RosterSlotValue> {
   for (const def of ROSTER_SLOT_DEFINITIONS) {
     slots[def.number] = {
       name: "",
+      title: "",
       position: def.position,
     }
   }

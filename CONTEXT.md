@@ -13,7 +13,7 @@ The full set of players named for a match, shown on the graphic. Content inside 
 _Avoid_: Team sheet (unless quoting external rugby usage), lineup card
 
 **Roster Slot**:
-A numbered place on the Matchday Squad with a position label and optional player name. Slots 1–15 are fixed; finishers are dynamic from jersey 16 upward.
+A numbered place on the Matchday Squad with a position label, optional player name, and optional title designation (C / VC). Slots 1–15 are fixed; finishers are dynamic from jersey 16 upward. Title is separate from the library name so the photo match stays clean.
 _Avoid_: Row, field, position slot
 
 **Finisher**:

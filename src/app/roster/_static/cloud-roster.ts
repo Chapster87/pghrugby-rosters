@@ -37,7 +37,15 @@ export type CloudRosterState = {
     address2: string
   }
   /** Jersey number (string key) → player. 1–15 always present; 16+ only when filled. */
-  roster: Record<string, { player_name: string; label: string }>
+  roster: Record<
+    string,
+    {
+      player_name: string
+      label: string
+      /** Optional leadership mark (C / VC); omitted when empty on older rows. */
+      title?: string
+    }
+  >
   branding: {
     /** URL or site path strings only — no `data:` URLs in cloud rows. */
     club_logo: string | null

@@ -112,7 +112,8 @@ export type UseBuilderStateResult = {
  * scratch.
  *
  * `userId` (when signed in) enables the cloud-shared Player Library: the cloud
- * copy loads and merges over the browser-local one, and add/remove sync up.
+ * set replaces the local cache on load (cloud is source of truth). Add/remove
+ * still write through to cloud.
  */
 export function useBuilderState(
   seed?: BuilderSeed | null,
@@ -159,45 +160,34 @@ export function useBuilderState(
   /* eslint-enable react-hooks/set-state-in-effect */
 
   /*
-    Cloud-shared Player Library, split by League: the active League's entries
-    load from the cloud and merge over the browser-local set (cloud wins on
-    conflicts; local-only entries are pushed up so nothing is lost). Swapping
-    the Roster's League swaps the working library. Signed out — local only.
+    Cloud-shared Player Library, split by League. When signed in, cloud is the
+    source of truth: replace the local cache with the cloud set (do not push
+    local-only names back up — that resurrected deletes across tabs/sessions).
+    Explicit add/rename still upsert; remove still deletes. Signed out or
+    cloud unreachable — browser-local cache only. League change swaps the set.
   */
   useEffect(() => {
     const league = state.draft.league
     if (!league) return
-    const local = loadPlayerLibrary(league)
-    savePlayerLibrary(league, local)
-    setState((prev) => ({ ...prev, playerLibrary: local }))
-    if (!userId) return
+
+    if (!userId) {
+      const local = loadPlayerLibrary(league)
+      setState((prev) => ({ ...prev, playerLibrary: local }))
+      return
+    }
+
     let active = true
     fetchPlayerLibrary(league)
       .then((cloud) => {
         if (!active) return
-        setState((prev) => {
-          const playerLibrary: PlayerLibrary = {
-            ...prev.playerLibrary,
-            ...cloud,
-          }
-          savePlayerLibrary(league, playerLibrary)
-          const localOnly = Object.entries(prev.playerLibrary).filter(
-            ([name]) => !(name in cloud)
-          )
-          if (localOnly.length > 0) {
-            void upsertPlayerLibraryEntries(
-              league,
-              localOnly.map(([player_name, photo_url]) => ({
-                player_name,
-                photo_url,
-              }))
-            ).catch(() => {})
-          }
-          return { ...prev, playerLibrary }
-        })
+        savePlayerLibrary(league, cloud)
+        setState((prev) => ({ ...prev, playerLibrary: cloud }))
       })
       .catch(() => {
-        // Cloud unavailable (e.g. signed out) — keep the browser-local library.
+        if (!active) return
+        // Cloud unavailable — keep the browser-local library for this League.
+        const local = loadPlayerLibrary(league)
+        setState((prev) => ({ ...prev, playerLibrary: local }))
       })
     return () => {
       active = false
@@ -279,6 +269,7 @@ export function useBuilderState(
       setState((prev) => {
         const current = prev.draft.slots[number] ?? {
           name: "",
+          title: "",
           position: "",
         }
         const draft: Draft = {

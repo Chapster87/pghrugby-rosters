@@ -7,9 +7,10 @@ export type CloudPlayerLibrary = Record<string, string>
 
 /**
  * Cloud-shared Player Library (Supabase `player_library` table), split by
- * League — each Roster works with its League's entries. URLs are the durable
- * copy that survives browser changes; the browser-local library merges into
- * it on load. Writes are authenticated-Operator-only (RLS).
+ * League — each Roster works with its League's entries. When signed in, this
+ * table is the source of truth: the browser cache is replaced from cloud on
+ * load (not merged upward, so deletes stay deleted). Writes are
+ * authenticated-Operator-only (RLS).
  */
 export async function fetchPlayerLibrary(
   league: LeagueId

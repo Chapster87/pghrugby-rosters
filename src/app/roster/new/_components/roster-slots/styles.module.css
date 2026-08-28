@@ -30,10 +30,10 @@
   gap: 6px;
 }
 
-/* HTML .slot-row: 34px num | position | name | 40px thumb */
+/* 34px num | position | name | ~2–3 char title | 40px thumb */
 .slotItem {
   display: grid;
-  grid-template-columns: 34px 1fr 1fr 40px;
+  grid-template-columns: 34px 1fr 1fr 3.25rem 40px;
   gap: 6px;
   align-items: center;
 }
@@ -56,7 +56,8 @@
 }
 
 .posInput,
-.nameInput {
+.nameInput,
+.titleInput {
   width: 100%;
   min-height: 34px;
   min-width: 0;
@@ -70,8 +71,24 @@
   font-size: 13px;
 }
 
+.titleInput {
+  padding-inline: 2px;
+  text-align: center;
+  /* Same weight as other inputs so the placeholder isn't heavy */
+  font-weight: inherit;
+  text-transform: uppercase;
+}
+
+.titleInput::placeholder {
+  text-transform: none;
+  font-weight: normal;
+  opacity: 1;
+  color: var(--color-grey-500);
+}
+
 .posInput:focus,
-.nameInput:focus {
+.nameInput:focus,
+.titleInput:focus {
   outline: 2px solid var(--color-primary);
   outline-offset: 1px;
 }

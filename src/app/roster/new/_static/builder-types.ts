@@ -26,6 +26,11 @@ export type MatchDetails = {
 export type RosterSlotValue = {
   /** Player display name; empty means unfilled. */
   name: string
+  /**
+   * Optional leadership mark shown next to the name on the graphic
+   * (e.g. C = captain, VC = vice-captain). Kept off the library name.
+   */
+  title: string
   /** Position label (defaults from rugby numbering; Operator may edit). */
   position: string
 }
