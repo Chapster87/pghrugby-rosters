@@ -17,6 +17,7 @@ import {
   deleteRoster,
   deserializeRoster,
   fetchRoster,
+  isDuplicateCopyTitle,
   updateRoster,
 } from "../../../_helpers/cloud-roster"
 import type { CloudRosterRow } from "../../../_static/cloud-roster"
@@ -116,6 +117,10 @@ export default function RosterShell() {
     setSaving(true)
     setSaveError(null)
     try {
+      // Duplicates pin "Copy of …" until Save — then drop custom and resume auto-title.
+      const clearingCopyTitle =
+        row.title_is_custom && isDuplicateCopyTitle(row.title)
+      const titleIsCustom = row.title_is_custom && !clearingCopyTitle
       await updateRoster(row.id, {
         // League lives in Match Details; fall back to the row column while the
         // editor is still seeding so Save never writes an empty league.
@@ -127,9 +132,12 @@ export default function RosterShell() {
         backgroundImage: builder.backgroundImage,
         backgroundIsCustom: builder.backgroundIsCustom,
         activeFormat: builder.activeFormat,
-        titleIsCustom: row.title_is_custom,
-        title: row.title_is_custom ? row.title : undefined,
+        titleIsCustom,
+        title: titleIsCustom ? row.title : undefined,
       })
+      if (clearingCopyTitle) {
+        setRow((prev) => (prev ? { ...prev, title_is_custom: false } : prev))
+      }
     } catch (error) {
       setSaveError(
         error instanceof Error ? error.message : "Could not save this Roster."

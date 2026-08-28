@@ -94,6 +94,14 @@ function storableImage(src: string | null): src is string {
   return src !== null && !src.startsWith("data:")
 }
 
+/** Prefix duplicateRoster pins on the copy; cleared on the next Save. */
+const COPY_OF_PREFIX = "Copy of "
+
+/** True when the title still carries the temporary duplicate marker. */
+export function isDuplicateCopyTitle(title: string | undefined): boolean {
+  return Boolean(title?.startsWith(COPY_OF_PREFIX))
+}
+
 /** Editor state → row columns + `state` jsonb `v:1`. */
 export function serializeRoster(write: RosterWrite): {
   title: string
@@ -105,7 +113,9 @@ export function serializeRoster(write: RosterWrite): {
   match_date: string | null
   state: CloudRosterState
 } {
-  const titleIsCustom = Boolean(write.titleIsCustom)
+  // Duplicates pin "Copy of …" as a custom title until Save; then resume auto-title.
+  const titleIsCustom =
+    Boolean(write.titleIsCustom) && !isDuplicateCopyTitle(write.title)
   const title = titleIsCustom
     ? (write.title ?? "")
     : buildAutoTitle({
