@@ -133,6 +133,12 @@
     text-transform: uppercase;
   }
 
+  .addressBlock {
+    display: grid;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
   .address {
     font-family:
       var(--font-bakbak-one), "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -141,6 +147,7 @@
     font-weight: 600;
     color: var(--color-white);
     padding-top: 4px;
+    line-height: 1;
   }
 
   .venueKickoff {

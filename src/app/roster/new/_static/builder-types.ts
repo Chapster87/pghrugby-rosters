@@ -15,6 +15,8 @@ export type MatchDetails = {
   venue: Venue
   /** Optional free-text level/flight within a League (distinguishes same-day games). */
   division: string
+  /** Venue/field name shown above the street address on the graphic. */
+  locationName: string
   address: string
   /** Second address line (rendered below Address on the graphic). */
   address2: string

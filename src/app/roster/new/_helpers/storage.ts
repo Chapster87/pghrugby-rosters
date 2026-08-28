@@ -108,6 +108,8 @@ function normalizeDraft(raw: unknown): Draft {
         : typeof record.competition === "string"
           ? record.competition
           : "",
+    locationName:
+      typeof record.locationName === "string" ? record.locationName : "",
     address: typeof record.address === "string" ? record.address : "",
     address2: typeof record.address2 === "string" ? record.address2 : "",
     slots,

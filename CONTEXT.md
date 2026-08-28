@@ -53,7 +53,7 @@ Kind of fixture: League (championship pathway), Friendly, Playoff, or Tour. Defa
 _Avoid_: Game type, fixture type
 
 **Match Details**:
-League, opponent, date, kickoff, venue (home/away), Match Type, optional Division, and address shown on the graphic header. Division is an optional free-text field that persists (column + `state.match`), distinguishing same-day games.
+League, opponent, date, kickoff, venue (home/away), Match Type, optional Division, location name, and address shown on the graphic header. Division is an optional free-text field that persists (column + `state.match`), distinguishing same-day games. Location Name is the venue/field label rendered above the street address on the graphic. Kickoff is stored as 24h from the time input and displayed on the graphic in 12-hour form.
 _Avoid_: Game info, fixture block, Competition (retired label for Division)
 
 **Background Image**:

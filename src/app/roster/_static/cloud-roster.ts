@@ -30,6 +30,8 @@ export type CloudRosterState = {
     /** Optional free-text timezone for the kickoff (e.g. ET). */
     timezone: string
     venue: Venue
+    /** Venue/field name shown above the street address on the graphic. */
+    location_name: string
     address: string
     /** Second address line (rendered below Address on the graphic). */
     address2: string

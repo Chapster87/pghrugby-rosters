@@ -14,6 +14,7 @@ import {
 } from "../../app/roster/new/_static/roster-slots"
 import { LEAGUE_LABEL } from "../../app/roster/_static/cloud-roster"
 import { corsModeForImageSrc } from "../../app/roster/new/_helpers/export-png"
+import { formatKickoff } from "../../app/roster/new/_helpers/format-kickoff"
 import { formatMatchDate } from "../../app/roster/new/_helpers/format-match-date"
 import { resolveSlotPhotoSrc } from "../../app/roster/new/_helpers/resolve-slot-photo"
 
@@ -148,11 +149,13 @@ export default function MatchdayGraphic({
   // Home → vs, Away → @ (same convention as buildAutoTitle).
   const matchupMarker = draft.venue === "Away" ? "@" : "vs"
   const dateStr = formatMatchDate(draft.matchDate)
-  const kickoff = draft.kickoff.trim()
+  // time input is 24h (HH:mm); graphic shows 12-hour clock.
+  const kickoff = formatKickoff(draft.kickoff)
   const timezone = draft.timezone.trim()
   // Stored id is mens|womens; graphic shows the display label (Men's / Women's).
   const leagueLabel = draft.league ? LEAGUE_LABEL[draft.league] : ""
   const division = draft.division.trim()
+  const locationName = draft.locationName.trim()
   const address = draft.address.trim()
   const address2 = draft.address2.trim()
   const filledSponsors = sponsors.filter(Boolean)
@@ -216,9 +219,7 @@ export default function MatchdayGraphic({
           <div className={s.dateVenue}>
             <p className={s.venueKickoff}>
               {draft.venue}
-              {kickoff
-                ? ` · ${kickoff} Kickoff${timezone ? ` ${timezone}` : ""}`
-                : ""}
+              {kickoff ? ` · ${kickoff}${timezone ? ` ${timezone}` : ""}` : ""}
             </p>
             <p className={s.date}>{dateStr}</p>
           </div>
@@ -226,8 +227,13 @@ export default function MatchdayGraphic({
         <div className={s.addresses}>
           <div className={s.fieldAddress}>
             <div className={s.addressLabel}>Field Address:</div>
-            {address ? <div className={s.address}>{address}</div> : null}
-            {address2 ? <div className={s.address}>{address2}</div> : null}
+            <div className={s.addressBlock}>
+              {locationName ? (
+                <div className={s.address}>{locationName}</div>
+              ) : null}
+              {address ? <div className={s.address}>{address}</div> : null}
+              {address2 ? <div className={s.address}>{address2}</div> : null}
+            </div>
           </div>
           {/*<div className={s.parkingAddress}>
             <div className={s.addressLabel}>Parking:</div>

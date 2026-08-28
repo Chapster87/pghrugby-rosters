@@ -24,6 +24,7 @@ export function createEmptyMatchDetails(): MatchDetails {
     timezone: "",
     venue: "Home",
     division: "",
+    locationName: "",
     address: "",
     address2: "",
   }
