@@ -234,7 +234,7 @@
   .photo {
     border-radius: 50%;
     object-fit: cover;
-    background: var(--color-grey-800);
+    background: rgb(from var(--color-white) r g b / 0.2);
     display: block;
     margin: 0 auto;
     border: 3px solid var(--color-black);
