@@ -157,22 +157,32 @@
   text-align: right;
 }
 
-.rowAction {
-  display: inline-flex;
-  padding: 6px 10px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  text-transform: uppercase;
-  text-decoration: none;
+.rowMenuButton {
+  background: none;
+  border: none;
+  color: var(--color-grey-600);
+  cursor: pointer;
+  padding: 4px;
   border-radius: 4px;
-  background: var(--color-grey-200);
-  color: var(--color-grey-800);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover {
-    background: var(--color-grey-300);
+    background-color: var(--color-grey-200);
     color: var(--color-black);
   }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: default;
+  }
+}
+
+.actionError {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-danger);
 }
 
 /* Empty / error / loading states inside the panel */

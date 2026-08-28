@@ -5,10 +5,16 @@ import Image from "next/image"
 import { supabase } from "@/utils/supabase"
 import { useAuth } from "@/hooks/use-auth"
 import Button from "@/components/button"
+import ContextMenu from "@/components/context-menu"
 import Link from "@/components/link"
+import SvgIcon from "@/components/svg-icon"
 import Heading from "@/components/typography/heading"
 import Text from "@/components/typography/text"
 
+import {
+  deleteRoster,
+  duplicateRoster,
+} from "@/app/roster/_helpers/cloud-roster"
 import {
   LEAGUE_LABEL,
   MATCH_TYPE_LABEL,
@@ -40,6 +46,11 @@ export default function RostersLanding() {
   const [rows, setRows] = useState<RosterRow[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [reload, setReload] = useState(0)
+  const [busy, setBusy] = useState<{
+    id: string
+    action: "duplicate" | "delete"
+  } | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!user) return
@@ -81,6 +92,43 @@ export default function RostersLanding() {
       womens: base.filter((r) => r.league === "womens").length,
     }
   }, [rows])
+
+  async function runRowAction(
+    roster: RosterRow,
+    action: "duplicate" | "delete",
+    perform: (userId: string) => Promise<unknown>
+  ) {
+    if (!user || busy) return
+    setBusy({ id: roster.id, action })
+    setActionError(null)
+    try {
+      await perform(user.id)
+      setReload((n) => n + 1)
+    } catch (error) {
+      setActionError(
+        error instanceof Error
+          ? error.message
+          : `Could not ${action} this Roster.`
+      )
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  function handleDuplicate(roster: RosterRow) {
+    void runRowAction(roster, "duplicate", (userId) =>
+      duplicateRoster(roster.id, userId)
+    )
+  }
+
+  function handleDelete(roster: RosterRow) {
+    if (!user || busy) return
+    const confirmed = window.confirm(
+      `Delete "${roster.title}" permanently? This can't be undone.`
+    )
+    if (!confirmed) return
+    void runRowAction(roster, "delete", () => deleteRoster(roster.id))
+  }
 
   if (loading) {
     return <div className={s.loadingPulse} aria-hidden="true" />
@@ -154,7 +202,7 @@ export default function RostersLanding() {
                   <th scope="col">Type</th>
                   <th scope="col">Edited</th>
                   <th scope="col">
-                    <span className={s.srOnly}>Open</span>
+                    <span className={s.srOnly}>Actions</span>
                   </th>
                 </tr>
               </thead>
@@ -185,12 +233,44 @@ export default function RostersLanding() {
                       {formatUpdated(roster.updated_at)}
                     </td>
                     <td className={s.actionCell}>
-                      <Link
-                        href={`/roster/${roster.id}/`}
-                        className={s.rowAction}
-                      >
-                        Open
-                      </Link>
+                      <ContextMenu>
+                        <ContextMenu.Trigger
+                          className={s.rowMenuButton}
+                          asChild
+                        >
+                          <button
+                            type="button"
+                            aria-label={`Actions for ${roster.title}`}
+                            disabled={busy !== null}
+                          >
+                            <SvgIcon icon="more-vertical" size={16} />
+                          </button>
+                        </ContextMenu.Trigger>
+                        <ContextMenu.Content>
+                          <ContextMenu.Link
+                            href={`/roster/${roster.id}/`}
+                            icon={<SvgIcon icon="external-link" size={14} />}
+                          >
+                            Open
+                          </ContextMenu.Link>
+                          <ContextMenu.Separator />
+                          <ContextMenu.Item
+                            onSelect={() => handleDuplicate(roster)}
+                            icon={<SvgIcon icon="copy" size={14} />}
+                            disabled={busy !== null}
+                          >
+                            Duplicate
+                          </ContextMenu.Item>
+                          <ContextMenu.Item
+                            onSelect={() => handleDelete(roster)}
+                            variant="danger"
+                            icon={<SvgIcon icon="trash-2" size={14} />}
+                            disabled={busy !== null}
+                          >
+                            Delete
+                          </ContextMenu.Item>
+                        </ContextMenu.Content>
+                      </ContextMenu>
                     </td>
                   </tr>
                 ))}
@@ -199,6 +279,12 @@ export default function RostersLanding() {
           </div>
         )}
       </div>
+
+      {actionError ? (
+        <p className={s.actionError} role="alert">
+          {actionError}
+        </p>
+      ) : null}
     </div>
   )
 }

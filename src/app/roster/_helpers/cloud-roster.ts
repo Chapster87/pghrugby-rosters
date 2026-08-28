@@ -272,3 +272,33 @@ export async function deleteRoster(id: string): Promise<void> {
   const { error } = await supabase.from("roster_drafts").delete().eq("id", id)
   if (error) throw postgrestError(error, "Could not delete this Roster.")
 }
+
+/**
+ * Clone a Roster row as a new draft with the same content. The copy's title
+ * is pinned to "Copy of <source>" so it stands out in the list; uploaded
+ * images are data URLs that never round-trip (cloud contract), so they fall
+ * back to defaults exactly as re-opening a saved Roster does.
+ */
+export async function duplicateRoster(
+  id: string,
+  userId: string
+): Promise<string> {
+  const row = await fetchRoster(id)
+  if (!row) throw new Error("Could not load this Roster.")
+  const base = deserializeRoster(row)
+  return insertRoster(
+    {
+      league: row.league,
+      draft: base.draft,
+      sponsors: base.sponsors,
+      sponsorsIsCustom: base.sponsorsIsCustom,
+      clubLogo: base.clubLogo,
+      backgroundImage: base.backgroundImage,
+      backgroundIsCustom: base.backgroundIsCustom,
+      activeFormat: base.activeFormat,
+      titleIsCustom: true,
+      title: `Copy of ${row.title}`,
+    },
+    userId
+  )
+}
