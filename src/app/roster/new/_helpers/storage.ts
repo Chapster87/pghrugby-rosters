@@ -62,7 +62,7 @@ function normalizeSlot(
   fallbackPosition: string
 ): RosterSlotValue {
   if (!raw || typeof raw !== "object") {
-    return { name: "", title: "", position: fallbackPosition }
+    return { name: "", title: "", position: fallbackPosition, photoUrl: "" }
   }
   const record = raw as Record<string, unknown>
   // Accept legacy HTML shape `{ name, pos }` and scaffold shape `{ name, position }`.
@@ -74,7 +74,8 @@ function normalizeSlot(
       : typeof record.pos === "string"
         ? record.pos
         : fallbackPosition
-  return { name, title, position }
+  const photoUrl = typeof record.photoUrl === "string" ? record.photoUrl : ""
+  return { name, title, position, photoUrl }
 }
 
 function normalizeDraft(raw: unknown): Draft {

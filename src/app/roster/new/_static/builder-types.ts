@@ -33,6 +33,11 @@ export type RosterSlotValue = {
   title: string
   /** Position label (defaults from rugby numbering; Operator may edit). */
   position: string
+  /**
+   * Photo URL frozen onto this Roster Slot (usually from the Player Library at
+   * pick/Save time). Survives library deletes/renames so past Rosters stay put.
+   */
+  photoUrl: string
 }
 
 /**

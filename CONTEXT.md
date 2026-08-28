@@ -13,7 +13,7 @@ The full set of players named for a match, shown on the graphic. Content inside 
 _Avoid_: Team sheet (unless quoting external rugby usage), lineup card
 
 **Roster Slot**:
-A numbered place on the Matchday Squad with a position label, optional player name, and optional title designation (C / VC). Slots 1–15 are fixed; finishers are dynamic from jersey 16 upward. Title is separate from the library name so the photo match stays clean.
+A numbered place on the Matchday Squad with a position label, optional player name, optional title designation (C / VC), and a photo frozen onto that slot. Slots 1–15 are fixed; finishers are dynamic from jersey 16 upward. Title is separate from the library name so the name/photo link stays clean. The slot photo is part of the Roster, not a live lookup into the Player Library after Save.
 _Avoid_: Row, field, position slot
 
 **Finisher**:
@@ -25,7 +25,7 @@ The role label on a Roster Slot (e.g. Hooker, Fly-half, Finisher). Defaults come
 _Avoid_: Role, job
 
 **Player Library**:
-The operator’s saved map of player display names to photo URLs, used to fill Roster Slot photos by name match. Split by League (Men’s / Women’s); each Roster works with its League’s pool, cloud-backed in `player_library`.
+The operator’s shared map of player display names to photo URLs for the current week’s editing. Split by League (Men’s / Women’s); cloud-backed in `player_library`. Used to pick players and seed a Roster Slot’s frozen photo; not the long-term source of truth for photos already saved on a Roster.
 _Avoid_: Squad database, roster DB, contacts
 
 **Club Logo**:

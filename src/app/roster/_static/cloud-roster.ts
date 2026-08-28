@@ -44,6 +44,12 @@ export type CloudRosterState = {
       label: string
       /** Optional leadership mark (C / VC); omitted when empty on older rows. */
       title?: string
+      /**
+       * Photo URL frozen on this Roster at Save (Drive-converted URL preferred).
+       * Makes past Rosters independent of the live Player Library. Omitted on
+       * legacy rows — load falls back to library-by-name until next Save.
+       */
+      photo_url?: string
     }
   >
   branding: {

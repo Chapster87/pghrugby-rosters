@@ -1,6 +1,11 @@
 import { supabase } from "@/utils/supabase"
 
-import type { Draft, Sponsors, Venue } from "../new/_static/builder-types"
+import type {
+  Draft,
+  PlayerLibrary,
+  Sponsors,
+  Venue,
+} from "../new/_static/builder-types"
 import { SPONSOR_SLOT_COUNT } from "../new/_static/builder-types"
 import type { GraphicFormatId } from "../new/_static/graphic-formats"
 import { ROSTER_SLOT_DEFINITIONS } from "../new/_static/roster-slots"
@@ -33,6 +38,11 @@ export type DeserializedRoster = {
 export type RosterWrite = {
   league: LeagueId
   draft: Draft
+  /**
+   * Working Player Library used to freeze missing slot photos onto the
+   * Roster at Save (name → URL). Already-frozen slot.photoUrl wins.
+   */
+  playerLibrary?: PlayerLibrary
   sponsors: Sponsors
   /** False = sponsors follow league defaults; true = custom set. */
   sponsorsIsCustom: boolean
@@ -126,6 +136,7 @@ export function serializeRoster(write: RosterWrite): {
         matchDate: write.draft.matchDate,
       })
 
+  const library = write.playerLibrary ?? {}
   const roster: CloudRosterState["roster"] = {}
   for (const [numStr, slot] of Object.entries(write.draft.slots)) {
     const num = Number(numStr)
@@ -137,6 +148,14 @@ export function serializeRoster(write: RosterWrite): {
       }
       const title = slot.title?.trim()
       if (title) entry.title = title
+      // Freeze the photo onto the slot so this Roster stops depending on the
+      // live Player Library (deletes/renames/new photos elsewhere).
+      const name = slot.name.trim()
+      const frozen =
+        slot.photoUrl?.trim() ||
+        (name && library[name] ? library[name] : "") ||
+        ""
+      if (frozen && storableImage(frozen)) entry.photo_url = frozen
       roster[numStr] = entry
     }
   }
@@ -194,7 +213,12 @@ export function deserializeRoster(row: CloudRosterRow): DeserializedRoster {
   // Starters always present with default Position labels.
   for (const def of ROSTER_SLOT_DEFINITIONS) {
     if (def.number <= FIXED_SLOT_MAX) {
-      slots[def.number] = { name: "", title: "", position: def.position }
+      slots[def.number] = {
+        name: "",
+        title: "",
+        position: def.position,
+        photoUrl: "",
+      }
     }
   }
   const storedRoster = state?.roster ?? {}
@@ -206,6 +230,8 @@ export function deserializeRoster(row: CloudRosterRow): DeserializedRoster {
       name: entry.player_name ?? "",
       title: entry.title ?? "",
       position: entry.label || def?.position || "Finisher",
+      // Legacy rows omit photo_url — leave empty and resolve via library until Save.
+      photoUrl: entry.photo_url ?? "",
     }
   }
 
@@ -309,6 +335,7 @@ export async function duplicateRoster(
     {
       league: row.league,
       draft: base.draft,
+      // Slot photo_url already frozen on the source draft — no live library needed.
       sponsors: base.sponsors,
       sponsorsIsCustom: base.sponsorsIsCustom,
       clubLogo: base.clubLogo,

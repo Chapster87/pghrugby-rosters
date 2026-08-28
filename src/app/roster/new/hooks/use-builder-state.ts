@@ -271,12 +271,27 @@ export function useBuilderState(
           name: "",
           title: "",
           position: "",
+          photoUrl: "",
+        }
+        // Name change: freeze the photo from the library (or clear when emptied).
+        // Keeps the Roster Slot independent of later library deletes/renames.
+        let nextPatch = patch
+        if ("name" in patch) {
+          const nextName = (patch.name ?? "").trim()
+          const libraryUrl =
+            nextName && prev.playerLibrary[nextName]
+              ? prev.playerLibrary[nextName]
+              : ""
+          nextPatch = {
+            ...patch,
+            photoUrl: nextName ? libraryUrl : "",
+          }
         }
         const draft: Draft = {
           ...prev.draft,
           slots: {
             ...prev.draft.slots,
-            [number]: { ...current, ...patch },
+            [number]: { ...current, ...nextPatch },
           },
         }
         if (!seed) saveDraft(draft)
@@ -308,7 +323,19 @@ export function useBuilderState(
           [trimmed]: photoUrl,
         }
         savePlayerLibrary(league, playerLibrary)
-        return { ...prev, playerLibrary }
+        // Working-week slots naming this player take the new URL; past
+        // Rosters already freeze on their own row and are unaffected.
+        const slots = { ...prev.draft.slots }
+        let slotsChanged = false
+        for (const [numStr, slot] of Object.entries(slots)) {
+          if (slot.name.trim() === trimmed && slot.photoUrl !== photoUrl) {
+            slots[Number(numStr)] = { ...slot, photoUrl }
+            slotsChanged = true
+          }
+        }
+        const draft = slotsChanged ? { ...prev.draft, slots } : prev.draft
+        if (slotsChanged && !seed) saveDraft(draft)
+        return { ...prev, playerLibrary, draft }
       })
       if (userId) {
         void upsertPlayerLibraryEntries(league, [
@@ -316,7 +343,7 @@ export function useBuilderState(
         ]).catch(() => {})
       }
     },
-    [state.draft.league, userId]
+    [seed, state.draft.league, userId]
   )
 
   const removePlayerLibraryEntry = useCallback(

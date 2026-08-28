@@ -37,6 +37,7 @@ export function createDefaultRosterSlots(): Record<number, RosterSlotValue> {
       name: "",
       title: "",
       position: def.position,
+      photoUrl: "",
     }
   }
   return slots

@@ -126,6 +126,7 @@ export default function RosterShell() {
         // editor is still seeding so Save never writes an empty league.
         league: builder.draft.league || row.league,
         draft: builder.draft,
+        playerLibrary: builder.playerLibrary,
         sponsors: builder.sponsors,
         sponsorsIsCustom: builder.sponsorsIsCustom,
         clubLogo: builder.clubLogo,

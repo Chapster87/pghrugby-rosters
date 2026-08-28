@@ -45,6 +45,7 @@ export default function BuilderShell() {
         {
           league,
           draft: builder.draft,
+          playerLibrary: builder.playerLibrary,
           sponsors: builder.sponsors,
           sponsorsIsCustom: builder.sponsorsIsCustom,
           clubLogo: builder.clubLogo,

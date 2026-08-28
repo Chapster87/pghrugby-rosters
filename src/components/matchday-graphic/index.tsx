@@ -74,15 +74,24 @@ function buildGroupSlots(
     // editor slot does not leave a gap on the graphic (16, 17, 18…).
     const displayNumber =
       group === "finishers" ? FINISHER_DISPLAY_START + index : def.number
-    const hasLibraryPhoto = Boolean(name && playerLibrary[name])
+    const photoSrc = resolveSlotPhotoSrc(
+      name,
+      value?.photoUrl,
+      playerLibrary,
+      clubLogoSrc
+    )
+    // Placeholder styling when neither a frozen slot photo nor a library hit.
+    const hasPhoto = Boolean(
+      value?.photoUrl?.trim() || (name && playerLibrary[name])
+    )
     return {
       slotNumber: def.number,
       displayNumber,
       name,
       title,
       position,
-      photoSrc: resolveSlotPhotoSrc(name, playerLibrary, clubLogoSrc),
-      isPlaceholder: !hasLibraryPhoto,
+      photoSrc,
+      isPlaceholder: !hasPhoto,
     }
   })
 }

@@ -12,6 +12,7 @@ import {
   ROSTER_SLOT_GROUPS,
   getRosterSlotsByGroup,
 } from "../../_static/roster-slots"
+import { resolveSlotPhotoSrc } from "../../_helpers/resolve-slot-photo"
 import PlayerNameCombobox from "../player-name-combobox"
 
 import s from "./styles.module.css"
@@ -59,12 +60,17 @@ export default function RosterSlotsPanel({
                   name: "",
                   title: "",
                   position: slot.position,
+                  photoUrl: "",
                 }
-                const trimmedName = value.name.trim()
-                const photoUrl =
-                  trimmedName && playerLibrary[trimmedName]
-                    ? playerLibrary[trimmedName]
-                    : null
+                const resolvedPhoto = resolveSlotPhotoSrc(
+                  value.name,
+                  value.photoUrl,
+                  playerLibrary,
+                  ""
+                )
+                // Empty string from resolve means crest-fallback with no crest here
+                // — treat as "no thumb" rather than showing a broken image.
+                const photoUrl = resolvedPhoto || null
 
                 return (
                   <li key={slot.number} className={s.slotItem}>
