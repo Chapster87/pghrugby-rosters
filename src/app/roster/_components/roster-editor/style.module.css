@@ -29,11 +29,3 @@
   flex: 1 1 460px;
   min-width: 0;
 }
-
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-  padding-top: 18px;
-}

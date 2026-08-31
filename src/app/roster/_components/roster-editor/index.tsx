@@ -1,7 +1,5 @@
 "use client"
 
-import type { ReactNode } from "react"
-
 import type { UseBuilderStateResult } from "../../new/hooks/use-builder-state"
 import MatchDetailsPanel from "../../new/_components/match-details"
 import BackgroundImagePanel from "../../new/_components/background-image"
@@ -15,16 +13,15 @@ import s from "./style.module.css"
 
 type RosterEditorProps = {
   builder: UseBuilderStateResult
-  /** Extra controls rendered under the panels (Save/Delete/League…). */
-  actions?: ReactNode
 }
 
 /**
  * Composed Mk.1 editor: controls column (Match Details, Player Library,
  * Roster Slots, Sponsors) + live Post/Story preview. Shared by the create
  * surface (`/roster/new/`) and the edit surface (`/roster/<uuid>/`).
+ * Primary Save / New / menu actions live in each shell's top document strip.
  */
-export default function RosterEditor({ builder, actions }: RosterEditorProps) {
+export default function RosterEditor({ builder }: RosterEditorProps) {
   return (
     <div className={s.shell} data-ready={builder.isReady}>
       <div className={s.controls}>
@@ -72,8 +69,6 @@ export default function RosterEditor({ builder, actions }: RosterEditorProps) {
           onUseDefault={builder.useDefaultBackground}
           onSaveDefault={builder.saveDefaultBackground}
         />
-
-        {actions ? <div className={s.actions}>{actions}</div> : null}
       </div>
 
       <div className={s.preview}>

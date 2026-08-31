@@ -4,7 +4,9 @@ import { useEffect, useMemo, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 
 import Button from "@/components/button"
+import ContextMenu from "@/components/context-menu"
 import Link from "@/components/link"
+import SvgIcon from "@/components/svg-icon"
 import { useAuth } from "@/hooks/use-auth"
 
 import {
@@ -16,6 +18,7 @@ import {
   buildAutoTitle,
   deleteRoster,
   deserializeRoster,
+  duplicateRoster,
   fetchRoster,
   isDuplicateCopyTitle,
   updateRoster,
@@ -37,9 +40,9 @@ const UUID_PATTERN =
  * Edit surface for `/roster/<uuid>/`. The id comes from the live path (Apache
  * rewrites unknown UUID URLs onto the exported template), never from
  * build-time params. Loads the cloud row, edits via the shared Mk.1 editor,
- * Save updates the row, Delete hard-deletes with a confirm. Signed-out
- * visitors get a sign-in gate — the full Reviewer read-only mode is its own
- * ticket (Dual-mode Operator vs Reviewer).
+ * Save updates the row. Duplicate/Delete live in the top strip context menu.
+ * Signed-out visitors get a sign-in gate — full Reviewer read-only mode is its
+ * own ticket (Dual-mode Operator vs Reviewer).
  */
 export default function RosterShell() {
   const pathname = usePathname()
@@ -55,7 +58,7 @@ export default function RosterShell() {
   const [row, setRow] = useState<CloudRosterRow | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
-  const [deleting, setDeleting] = useState(false)
+  const [busy, setBusy] = useState<"duplicate" | "delete" | null>(null)
   const [saveError, setSaveError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -148,13 +151,30 @@ export default function RosterShell() {
     }
   }
 
+  async function handleDuplicate() {
+    if (!row || !user || busy) return
+    setBusy("duplicate")
+    setSaveError(null)
+    try {
+      const newId = await duplicateRoster(row.id, user.id)
+      router.push(`/roster/${newId}/`)
+    } catch (error) {
+      setSaveError(
+        error instanceof Error
+          ? error.message
+          : "Could not duplicate this Roster."
+      )
+      setBusy(null)
+    }
+  }
+
   async function handleDelete() {
-    if (!row || deleting) return
+    if (!row || busy) return
     const confirmed = window.confirm(
       "Delete this Roster permanently? This can't be undone."
     )
     if (!confirmed) return
-    setDeleting(true)
+    setBusy("delete")
     setSaveError(null)
     try {
       await deleteRoster(row.id)
@@ -163,11 +183,12 @@ export default function RosterShell() {
       setSaveError(
         error instanceof Error ? error.message : "Could not delete this Roster."
       )
-      setDeleting(false)
+      setBusy(null)
     }
   }
 
   const notFound = !valid || status === "missing"
+  const menuBusy = busy !== null
 
   return (
     <div className={s.page}>
@@ -192,13 +213,55 @@ export default function RosterShell() {
             type="button"
             size="small"
             onClick={handleSave}
-            disabled={!user || !row || saving}
+            disabled={!user || !row || saving || menuBusy}
             isLoading={saving}
           >
             {saving ? "Saving…" : "Save"}
           </Button>
+          {user && row && status === "found" ? (
+            <ContextMenu>
+              <ContextMenu.Trigger>
+                <button
+                  type="button"
+                  className={s.menuButton}
+                  aria-label="Roster actions"
+                  disabled={menuBusy}
+                >
+                  <SvgIcon icon="more-vertical" size={16} />
+                </button>
+              </ContextMenu.Trigger>
+              <ContextMenu.Content>
+                <ContextMenu.Item
+                  onSelect={() => {
+                    void handleDuplicate()
+                  }}
+                  icon={<SvgIcon icon="copy" size={14} />}
+                  disabled={menuBusy}
+                >
+                  {busy === "duplicate" ? "Duplicating…" : "Duplicate"}
+                </ContextMenu.Item>
+                <ContextMenu.Separator />
+                <ContextMenu.Item
+                  onSelect={() => {
+                    void handleDelete()
+                  }}
+                  variant="danger"
+                  icon={<SvgIcon icon="trash-2" size={14} />}
+                  disabled={menuBusy}
+                >
+                  {busy === "delete" ? "Deleting…" : "Delete"}
+                </ContextMenu.Item>
+              </ContextMenu.Content>
+            </ContextMenu>
+          ) : null}
         </div>
       </div>
+
+      {saveError ? (
+        <p className={s.saveError} role="alert">
+          {saveError}
+        </p>
+      ) : null}
 
       {status === "loading" || (status === "found" && authLoading) ? (
         <div className={s.panel} role="status" aria-busy="true">
@@ -232,26 +295,7 @@ export default function RosterShell() {
           </Link>
         </div>
       ) : (
-        <RosterEditor
-          builder={builder}
-          actions={
-            <>
-              <button
-                type="button"
-                className={s.deleteButton}
-                onClick={handleDelete}
-                disabled={deleting}
-              >
-                {deleting ? "Deleting…" : "Delete Roster"}
-              </button>
-              {saveError ? (
-                <p className={s.saveError} role="alert">
-                  {saveError}
-                </p>
-              ) : null}
-            </>
-          }
-        />
+        <RosterEditor builder={builder} />
       )}
     </div>
   )

@@ -46,13 +46,15 @@
   }
 }
 
-/* HTML .btn-ghost: light fill, dark type */
+/* Ghost on the grey page chrome: white fill + border so it doesn't blend into --background */
 .secondary {
-  background-color: #eee;
-  color: #333;
+  background-color: var(--color-white);
+  color: var(--color-grey-800);
+  border: 1px solid var(--color-grey-400);
 
   &:hover {
-    background-color: #e2e2e2;
+    background-color: var(--color-grey-100);
+    border-color: var(--color-grey-600);
     color: var(--color-black);
   }
 }

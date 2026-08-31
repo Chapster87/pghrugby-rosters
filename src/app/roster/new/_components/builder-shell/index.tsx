@@ -17,6 +17,8 @@ import s from "./styles.module.css"
  * Composed Matchday Squad builder shell for `/roster/new/` — the create
  * surface. Local autosave scratch until the first cloud Save, which inserts a
  * `roster_drafts` row and moves the Operator to `/roster/<uuid>/`.
+ *
+ * Document strip mirrors the edit surface: primary Save (and clear) live top-right.
  */
 export default function BuilderShell() {
   const { user } = useAuth()
@@ -26,9 +28,9 @@ export default function BuilderShell() {
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
 
-  function handleClearDraft() {
+  function handleNewRoster() {
     const confirmed = window.confirm(
-      "Clear all names and match details for a new week? Your logo and photo library are kept."
+      "Start a new Roster? Match details and squad names will be cleared. Your logo and photo library are kept."
     )
     if (!confirmed) return
     builder.clearDraft()
@@ -67,14 +69,28 @@ export default function BuilderShell() {
   }
 
   return (
-    <RosterEditor
-      builder={builder}
-      actions={
-        <>
+    <div className={s.page}>
+      <div className={s.strip}>
+        <div className={s.stripLeft}>
+          <Link href="/" className={s.backLink}>
+            ← Rosters
+          </Link>
+          <span className={s.divider} aria-hidden="true" />
+          <h2 className={s.rosterTitle}>New Roster</h2>
+        </div>
+        <div className={s.stripRight}>
+          <Button
+            type="button"
+            variant="secondary"
+            size="small"
+            onClick={handleNewRoster}
+          >
+            New Roster
+          </Button>
           {user ? (
             <Button
               type="button"
-              variant="primary"
+              size="small"
               onClick={handleSave}
               disabled={!builder.draft.league || saving}
               isLoading={saving}
@@ -82,22 +98,24 @@ export default function BuilderShell() {
               {saving ? "Saving…" : "Save"}
             </Button>
           ) : (
-            <Link href="/sign-in/?returnTo=/roster/new/" buttonStyle>
+            <Link
+              href="/sign-in/?returnTo=/roster/new/"
+              buttonStyle
+              size="small"
+            >
               Sign in to save
             </Link>
           )}
+        </div>
+      </div>
 
-          <Button variant="secondary" type="button" onClick={handleClearDraft}>
-            New Week (clear roster)
-          </Button>
+      {saveError ? (
+        <p className={s.saveError} role="alert">
+          {saveError}
+        </p>
+      ) : null}
 
-          {saveError ? (
-            <p className={s.saveError} role="alert">
-              {saveError}
-            </p>
-          ) : null}
-        </>
-      }
-    />
+      <RosterEditor builder={builder} />
+    </div>
   )
 }

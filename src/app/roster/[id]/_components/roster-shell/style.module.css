@@ -29,7 +29,33 @@
 .stripRight {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
+}
+
+.menuButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--color-grey-400);
+  border-radius: 6px;
+  background: var(--color-white);
+  color: var(--color-grey-700);
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    border-color: var(--color-grey-600);
+    color: var(--color-black);
+    background: var(--color-grey-100);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 }
 
 .backLink {
@@ -98,40 +124,8 @@
   animation: var(--animate-pulse);
 }
 
-/* Danger action in the editor actions row (mirrors Button chrome). */
-.deleteButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-weight: 700;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  padding: 8px 14px;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  background-color: var(--color-danger);
-  color: var(--color-white);
-
-  &:hover {
-    background-color: color-mix(
-      in srgb,
-      var(--color-danger) 82%,
-      var(--color-black)
-    );
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-}
-
 .saveError {
   margin: 0;
-  flex-basis: 100%;
   font-size: 13px;
   color: var(--color-danger);
 }
