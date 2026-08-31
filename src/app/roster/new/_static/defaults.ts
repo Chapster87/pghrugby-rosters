@@ -18,6 +18,7 @@ export const CLUB_LOGO_DEFAULT = "/images/pittsburgh-forge-crest.png"
 export function createEmptyMatchDetails(): MatchDetails {
   return {
     league: "",
+    matchType: "league",
     opponent: "",
     matchDate: "",
     kickoff: "",

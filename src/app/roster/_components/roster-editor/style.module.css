@@ -15,7 +15,7 @@
 .controls {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 16px;
   flex: 1 1 460px;
   min-width: 0;
   max-width: 520px;
@@ -23,6 +23,47 @@
   background-color: var(--color-white);
   border-radius: 10px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.tabList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.tab {
+  margin: 0;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  background: #eee;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  cursor: pointer;
+  color: #333;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1.2;
+  white-space: nowrap;
+
+  &[data-state="active"] {
+    background-color: var(--color-black);
+    color: var(--color-white);
+  }
+}
+
+.tabPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+
+  &[hidden] {
+    display: none;
+  }
 }
 
 .preview {

@@ -2,7 +2,7 @@
 
 import type { ChangeEvent } from "react"
 
-import type { LeagueId } from "../../../_static/cloud-roster"
+import type { LeagueId, MatchTypeId } from "../../../_static/cloud-roster"
 import type { MatchDetails, Venue } from "../../_static/builder-types"
 
 import s from "./styles.module.css"
@@ -31,6 +31,18 @@ export default function MatchDetailsPanel({
     const next = event.target.value
     if (next === "mens" || next === "womens") {
       onChange({ league: next as LeagueId })
+    }
+  }
+
+  function handleMatchTypeChange(event: ChangeEvent<HTMLSelectElement>) {
+    const next = event.target.value
+    if (
+      next === "league" ||
+      next === "friendly" ||
+      next === "playoff" ||
+      next === "tour"
+    ) {
+      onChange({ matchType: next as MatchTypeId })
     }
   }
 
@@ -65,6 +77,20 @@ export default function MatchDetailsPanel({
             />
           </label>
         </div>
+
+        <label className={s.field}>
+          <span className={s.label}>Match Type</span>
+          <select
+            className={s.input}
+            value={value.matchType}
+            onChange={handleMatchTypeChange}
+          >
+            <option value="league">League</option>
+            <option value="friendly">Friendly</option>
+            <option value="playoff">Playoff</option>
+            <option value="tour">Tour</option>
+          </select>
+        </label>
 
         <label className={s.field}>
           <span className={s.label}>Opponent</span>

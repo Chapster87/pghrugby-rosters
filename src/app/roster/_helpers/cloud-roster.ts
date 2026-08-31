@@ -16,6 +16,7 @@ import {
   type CloudRosterRow,
   type CloudRosterState,
   type LeagueId,
+  type MatchTypeId,
 } from "../_static/cloud-roster"
 
 /** Builder-shaped editor state hydrated from a cloud row. */
@@ -165,7 +166,7 @@ export function serializeRoster(write: RosterWrite): {
     title_is_custom: titleIsCustom,
     league: write.league,
     division: write.draft.division.trim() || null,
-    match_type: "league",
+    match_type: write.draft.matchType,
     opponent: write.draft.opponent.trim() || null,
     match_date: write.draft.matchDate || null,
     state: {
@@ -173,7 +174,7 @@ export function serializeRoster(write: RosterWrite): {
       match: {
         league: write.league,
         division: write.draft.division.trim() || null,
-        match_type: "league",
+        match_type: write.draft.matchType,
         opponent: write.draft.opponent,
         match_date: write.draft.matchDate || null,
         kickoff: write.draft.kickoff,
@@ -203,6 +204,15 @@ export function serializeRoster(write: RosterWrite): {
 
 function isVenue(value: unknown): value is Venue {
   return value === "Home" || value === "Away"
+}
+
+function isMatchType(value: unknown): value is MatchTypeId {
+  return (
+    value === "league" ||
+    value === "friendly" ||
+    value === "playoff" ||
+    value === "tour"
+  )
 }
 
 /** Cloud row → builder-shaped editor state (image data URLs never round-trip). */
@@ -244,6 +254,11 @@ export function deserializeRoster(row: CloudRosterRow): DeserializedRoster {
   return {
     draft: {
       league: state?.match?.league ?? "",
+      matchType: isMatchType(state?.match?.match_type)
+        ? state.match.match_type
+        : isMatchType(row.match_type)
+          ? row.match_type
+          : "league",
       opponent: state?.match?.opponent ?? "",
       matchDate: state?.match?.match_date ?? "",
       kickoff: state?.match?.kickoff ?? "",

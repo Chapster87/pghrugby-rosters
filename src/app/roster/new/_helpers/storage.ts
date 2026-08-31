@@ -12,7 +12,7 @@ import {
   createEmptyPlayerLibrary,
   createEmptySponsors,
 } from "../_static/defaults"
-import type { LeagueId } from "../../_static/cloud-roster"
+import type { LeagueId, MatchTypeId } from "../../_static/cloud-roster"
 import { ROSTER_SLOT_DEFINITIONS } from "../_static/roster-slots"
 import { STORAGE_KEYS } from "../_static/storage-keys"
 
@@ -57,6 +57,15 @@ function isLeague(value: unknown): value is LeagueId {
   return value === "mens" || value === "womens"
 }
 
+function isMatchType(value: unknown): value is MatchTypeId {
+  return (
+    value === "league" ||
+    value === "friendly" ||
+    value === "playoff" ||
+    value === "tour"
+  )
+}
+
 function normalizeSlot(
   raw: unknown,
   fallbackPosition: string
@@ -98,6 +107,7 @@ function normalizeDraft(raw: unknown): Draft {
 
   return {
     league: isLeague(record.league) ? record.league : "",
+    matchType: isMatchType(record.matchType) ? record.matchType : "league",
     opponent: typeof record.opponent === "string" ? record.opponent : "",
     matchDate: typeof record.matchDate === "string" ? record.matchDate : "",
     kickoff: typeof record.kickoff === "string" ? record.kickoff : "",
