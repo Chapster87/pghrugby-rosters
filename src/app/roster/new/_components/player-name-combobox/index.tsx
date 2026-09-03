@@ -122,15 +122,19 @@ export default function PlayerNameCombobox({
         <input
           ref={inputRef}
           id={id}
+          name={`player-${id}`}
           type="text"
           className={s.input}
           value={value}
           placeholder={placeholder}
           aria-label={ariaLabel}
-          /* Chrome ignores autocomplete="off" on name-like fields; new-password
-             reliably suppresses native autofill so it never overlaps the
-             Radix suggestion dropdown. */
-          autoComplete="new-password"
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
+          data-1p-ignore="true"
+          data-lpignore="true"
+          data-form-type="other"
           role="combobox"
           aria-expanded={open}
           aria-controls={listId}

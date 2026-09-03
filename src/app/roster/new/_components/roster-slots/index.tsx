@@ -79,11 +79,17 @@ export default function RosterSlotsPanel({
                     </span>
                     <input
                       id={`pos-${slot.number}`}
+                      name={`pos-${slot.number}`}
                       type="text"
                       className={s.posInput}
                       value={value.position}
                       placeholder={slot.position}
                       aria-label={`Position for jersey ${slot.number}`}
+                      autoComplete="off"
+                      autoCorrect="off"
+                      spellCheck={false}
+                      data-1p-ignore="true"
+                      data-lpignore="true"
                       onChange={(event) =>
                         onSlotChange(slot.number, {
                           position: event.target.value,
@@ -101,6 +107,7 @@ export default function RosterSlotsPanel({
                     />
                     <input
                       id={`title-${slot.number}`}
+                      name={`title-${slot.number}`}
                       type="text"
                       className={s.titleInput}
                       value={value.title}
@@ -108,6 +115,11 @@ export default function RosterSlotsPanel({
                       maxLength={3}
                       aria-label={`Title for jersey ${slot.number} (e.g. C, VC)`}
                       title="Title (C, VC)"
+                      autoComplete="off"
+                      autoCorrect="off"
+                      spellCheck={false}
+                      data-1p-ignore="true"
+                      data-lpignore="true"
                       onChange={(event) =>
                         onSlotChange(slot.number, {
                           title: event.target.value,
