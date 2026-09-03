@@ -36,9 +36,25 @@ const ICON_PATHS: Record<SvgIconName, React.ReactNode> = {
       <line x1="10" y1="14" x2="21" y2="3" />
     </>
   ),
+  "share-2": (
+    <>
+      <circle cx="18" cy="5" r="3" />
+      <circle cx="6" cy="12" r="3" />
+      <circle cx="18" cy="19" r="3" />
+      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+    </>
+  ),
+  check: <polyline points="20 6 9 17 4 12" />,
 }
 
-export type SvgIconName = "more-vertical" | "copy" | "trash-2" | "external-link"
+export type SvgIconName =
+  | "more-vertical"
+  | "copy"
+  | "trash-2"
+  | "external-link"
+  | "share-2"
+  | "check"
 
 interface SvgIconProps {
   /** Icon id from the inline set (feather-style ids, e.g. 'more-vertical'). */
