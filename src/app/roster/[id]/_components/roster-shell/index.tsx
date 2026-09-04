@@ -109,7 +109,14 @@ function OperatorView({
         title: titleIsCustom ? row.title : undefined,
       })
       if (clearingCopyTitle) {
-        onRowUpdated({ ...row, title_is_custom: false })
+        const autoTitle = buildAutoTitle({
+          league: builder.draft.league || row.league,
+          division: builder.draft.division || row.division,
+          opponent: builder.draft.opponent,
+          venue: builder.draft.venue,
+          matchDate: builder.draft.matchDate,
+        })
+        onRowUpdated({ ...row, title_is_custom: false, title: autoTitle })
       }
     } catch (error) {
       setSaveError(

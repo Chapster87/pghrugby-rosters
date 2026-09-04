@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 import { supabase } from "@/utils/supabase"
 import { useAuth } from "@/hooks/use-auth"
 import Button from "@/components/button"
@@ -41,6 +42,7 @@ const CREST_SRC = "/images/pittsburgh-forge-crest.png"
  */
 export default function RostersLanding() {
   const { user, loading } = useAuth()
+  const router = useRouter()
 
   const [filter, setFilter] = useState<Filter>("all")
   const [rows, setRows] = useState<RosterRow[] | null>(null)
@@ -115,10 +117,21 @@ export default function RostersLanding() {
     }
   }
 
-  function handleDuplicate(roster: RosterRow) {
-    void runRowAction(roster, "duplicate", (userId) =>
-      duplicateRoster(roster.id, userId)
-    )
+  async function handleDuplicate(roster: RosterRow) {
+    if (!user || busy) return
+    setBusy({ id: roster.id, action: "duplicate" })
+    setActionError(null)
+    try {
+      const newId = await duplicateRoster(roster.id, user.id)
+      router.push(`/roster/${newId}/`)
+    } catch (error) {
+      setActionError(
+        error instanceof Error
+          ? error.message
+          : "Could not duplicate this Roster."
+      )
+      setBusy(null)
+    }
   }
 
   function handleDelete(roster: RosterRow) {

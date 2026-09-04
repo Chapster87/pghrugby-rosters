@@ -124,9 +124,7 @@ export function serializeRoster(write: RosterWrite): {
   match_date: string | null
   state: CloudRosterState
 } {
-  // Duplicates pin "Copy of …" as a custom title until Save; then resume auto-title.
-  const titleIsCustom =
-    Boolean(write.titleIsCustom) && !isDuplicateCopyTitle(write.title)
+  const titleIsCustom = Boolean(write.titleIsCustom)
   const title = titleIsCustom
     ? (write.title ?? "")
     : buildAutoTitle({
