@@ -101,3 +101,22 @@ jobs:
             -e "ssh -o IdentitiesOnly=yes" \
             ./out/ \
             "dreamhost:${DREAMHOST_REMOTE_PATH}"
+
+      - name: Deploy Supabase keepalive script
+        env:
+          # Directory on DreamHost, relative to the login home dir unless the
+          # secret sets an absolute path. Must match the cron job command.
+          DREAMHOST_REMOTE_BIN: ${{ secrets.DREAMHOST_REMOTE_BIN }}
+        run: |
+          set -euo pipefail
+
+          remote_bin="${DREAMHOST_REMOTE_BIN:-bin}"
+          echo "Deploying keepalive script to dreamhost:${remote_bin}/"
+
+          rsync -avz \
+            -e "ssh -o IdentitiesOnly=yes" \
+            ./scripts/supabase-keepalive.sh \
+            "dreamhost:${remote_bin}/"
+
+          ssh -o IdentitiesOnly=yes dreamhost \
+            "chmod 755 '${remote_bin}/supabase-keepalive.sh'"
